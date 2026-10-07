@@ -16,6 +16,8 @@ import {
   Grid
 } from 'lucide-react';
 
+// transformar em menu hamburguer para o celular
+
 export function GivNavbar() {
   const { currentRole, currentView, navigateTo, services } = useApp();
   const [megaMenuOpen, setMegaMenuOpen] = useState(false);
@@ -24,7 +26,7 @@ export function GivNavbar() {
   const categories = Array.from(new Set(services.map(s => s.category)));
 
   return (
-    <nav className="w-full bg-[#111827] text-white border-b border-gray-800 text-xs font-medium relative z-30">
+    <nav className="w-full bg-[#263C75] text-white border-b border-gray-800 text-xs font-medium relative z-30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between overflow-x-auto no-scrollbar py-1">
           
@@ -50,16 +52,16 @@ export function GivNavbar() {
                       : 'text-gray-300 hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  Início
-                </button>
-                <button
-                  onClick={() => navigateTo('catalogo')}
-                  className={`px-3 py-2 rounded-lg transition whitespace-nowrap ${
-                    currentView === 'catalogo'
-                      ? 'text-brand-yellow font-bold bg-white/10'
-                      : 'text-gray-300 hover:text-white hover:bg-white/5'
-                  }`}
-                >
+                {/*  Início*/}
+                {/*</button>*/}
+                {/*<button*/}
+                {/*  onClick={() => navigateTo('catalogo')}*/}
+                {/*  className={`px-3 py-2 rounded-lg transition whitespace-nowrap ${*/}
+                {/*    currentView === 'catalogo'*/}
+                {/*      ? 'text-brand-yellow font-bold bg-white/10'*/}
+                {/*      : 'text-gray-300 hover:text-white hover:bg-white/5'*/}
+                {/*  }`}*/}
+                {/*>*/}
                   Catálogo Completo
                 </button>
                 <button
@@ -213,11 +215,11 @@ export function GivNavbar() {
 
           </div>
 
-          {/* Quick Production Highlight */}
-          <div className="hidden xl:flex items-center gap-2 text-gray-400 text-[11px] whitespace-nowrap pl-4">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>Produção Rápida em Delmiro Gouveia: Banners em 24h</span>
-          </div>
+          {/*/!* Quick Production Highlight *!/*/}
+          {/*<div className="hidden xl:flex items-center gap-2 text-gray-400 text-[11px] whitespace-nowrap pl-4">*/}
+          {/*  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>*/}
+          {/*  <span>Produção Rápida em Delmiro Gouveia: Banners em 24h</span>*/}
+          {/*</div>*/}
 
         </div>
       </div>

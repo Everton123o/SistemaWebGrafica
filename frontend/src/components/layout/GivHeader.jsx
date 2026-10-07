@@ -63,10 +63,10 @@ export function GivHeader() {
                   <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-brand-navy">
                     GRÁFICA
                   </span>
-                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-brand-magenta"></span>
-                  <span className="text-[9px] text-gray-400 font-medium hidden sm:inline">
-                    Delmiro Gouveia - AL
-                  </span>
+                  {/*<span className="inline-block w-1.5 h-1.5 rounded-full bg-brand-magenta"></span>*/}
+                  {/*<span className="text-[9px] text-gray-400 font-medium hidden sm:inline">*/}
+                  {/*  Delmiro Gouveia - AL*/}
+                  {/*</span>*/}
                 </div>
               </div>
             </button>
@@ -151,7 +151,7 @@ export function GivHeader() {
             
             {/* WhatsApp Contact */}
             <a
-              href="https://wa.me/5582999999999?text=Ol%C3%A1%2C%20gostaria%20de%20um%20or%C3%A7amento%20na%20PrintPro%20Gr%C3%A1fica!"
+              href="https://wa.me/5582999330488?text=Ol%C3%A1%2C%20gostaria%20de%20um%20or%C3%A7amento%20na%20PrintPro%20Gr%C3%A1fica!%20sou%20marcolinha%20do%20x%20%2B18"
               target="_blank"
               rel="noopener noreferrer"
               className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 font-semibold text-xs transition"
@@ -162,47 +162,47 @@ export function GivHeader() {
               </div>
               <div className="text-left leading-tight">
                 <span className="block text-[10px] text-emerald-600 font-normal">WhatsApp DG</span>
-                <span className="font-bold text-xs">(82) 99999-9999</span>
+                <span className="font-bold text-xs">(82) 9 9933-0488</span>
               </div>
             </a>
 
-            {/* User / Orders Indicator */}
-            {currentRole === 'CLIENTE' ? (
-              <button
-                onClick={() => navigateTo('meus-pedidos')}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-gray-100 text-gray-700 transition relative"
-                title="Acompanhar meus pedidos"
-              >
-                <div className="w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-700">
-                  <Package className="w-4 h-4 text-brand-navy" />
-                </div>
-                <div className="hidden sm:block text-left text-xs leading-tight">
-                  <span className="text-gray-500 block text-[10px]">Área do Cliente</span>
-                  <span className="font-bold text-gray-900">Meus Pedidos</span>
-                </div>
-                {pendingCorrectionsCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-600 text-[10px] font-bold text-white animate-bounce">
-                    {pendingCorrectionsCount}
-                  </span>
-                )}
-              </button>
-            ) : currentRole === 'RESPONSAVEL_GRAFICA' ? (
-              <button
-                onClick={() => navigateTo('resp-dashboard')}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-900 font-semibold text-xs"
-              >
-                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-                <span>Painel Técnico Operador</span>
-              </button>
-            ) : (
-              <button
-                onClick={() => navigateTo('admin-dashboard')}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-50 border border-purple-200 text-purple-900 font-semibold text-xs"
-              >
-                <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
-                <span>Painel Administrativo</span>
-              </button>
-            )}
+            {/*/!* User / Orders Indicator *!/*/}
+            {/*{currentRole === 'CLIENTE' ? (*/}
+            {/*  <button*/}
+            {/*    onClick={() => navigateTo('meus-pedidos')}*/}
+            {/*    className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-gray-100 text-gray-700 transition relative"*/}
+            {/*    title="Acompanhar meus pedidos"*/}
+            {/*  >*/}
+            {/*    <div className="w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-700">*/}
+            {/*      <Package className="w-4 h-4 text-brand-navy" />*/}
+            {/*    </div>*/}
+            {/*    <div className="hidden sm:block text-left text-xs leading-tight">*/}
+            {/*      <span className="text-gray-500 block text-[10px]">Área do Cliente</span>*/}
+            {/*      <span className="font-bold text-gray-900">Meus Pedidos</span>*/}
+            {/*    </div>*/}
+            {/*    {pendingCorrectionsCount > 0 && (*/}
+            {/*      <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-600 text-[10px] font-bold text-white animate-bounce">*/}
+            {/*        {pendingCorrectionsCount}*/}
+            {/*      </span>*/}
+            {/*    )}*/}
+            {/*  </button>*/}
+            {/*) : currentRole === 'RESPONSAVEL_GRAFICA' ? (*/}
+            {/*  <button*/}
+            {/*    onClick={() => navigateTo('resp-dashboard')}*/}
+            {/*    className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-900 font-semibold text-xs"*/}
+            {/*  >*/}
+            {/*    <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>*/}
+            {/*    <span>Painel Técnico Operador</span>*/}
+            {/*  </button>*/}
+            {/*) : (*/}
+            {/*  <button*/}
+            {/*    onClick={() => navigateTo('admin-dashboard')}*/}
+            {/*    className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-50 border border-purple-200 text-purple-900 font-semibold text-xs"*/}
+            {/*  >*/}
+            {/*    <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>*/}
+            {/*    <span>Painel Administrativo</span>*/}
+            {/*  </button>*/}
+            {/*)}*/}
 
             {/* Shopping Cart Pill */}
             <button

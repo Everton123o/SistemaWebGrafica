@@ -15,6 +15,8 @@ import {
 export function CategoryMiniBanners() {
   const { navigateTo } = useApp();
 
+  //rever depois para deixar mais bonito
+
   const categories = [
     {
       name: 'Cartões de Visita',
@@ -79,7 +81,7 @@ export function CategoryMiniBanners() {
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-base sm:text-lg font-black text-gray-900 tracking-tight flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-brand-cyan" />
+            {/*<Sparkles className="w-4 h-4 text-brand-cyan" />*/}
             Navegue por Departamentos Rápidos
           </h2>
           <p className="text-xs text-gray-500 mt-0.5">
@@ -89,7 +91,7 @@ export function CategoryMiniBanners() {
 
         <button
           onClick={() => navigateTo('catalogo')}
-          className="text-xs font-bold text-brand-navy hover:text-brand-cyan flex items-center gap-1 transition"
+          className="text-xs font-bold text-brand-navy hover:text-brand-gold flex items-center gap-1 transition"
         >
           <span>Ver catálogo completo</span>
           <ChevronRight className="w-3.5 h-3.5" />
@@ -103,7 +105,7 @@ export function CategoryMiniBanners() {
             <button
               key={idx}
               onClick={() => navigateTo('novo-pedido', { serviceId: cat.serviceId })}
-              className="group flex flex-col items-center p-3 rounded-2xl bg-white border border-gray-200/80 hover:border-brand-cyan shadow-2xs hover:shadow-md transition-all transform hover:-translate-y-1 text-center"
+              className="group flex flex-col items-center p-3 rounded-2xl bg-white border border-gray-200/80 hover:border-brand-navy shadow-2xs hover:shadow-md transition-all transform hover:-translate-y-1 text-center"
             >
               <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${cat.bg} text-white flex items-center justify-center shadow-sm group-hover:scale-110 transition duration-300`}>
                 <Icon className="w-7 h-7" />

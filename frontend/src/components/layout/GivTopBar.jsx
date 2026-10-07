@@ -58,10 +58,10 @@ export function GivTopBar() {
           )}
         </div>
 
-        {/* Right: Quick Role Switcher */}
-        <div className="flex items-center gap-2">
-          <RoleSwitcher />
-        </div>
+        {/*/!* Right: Quick Role Switcher *!/*/}
+        {/*<div className="flex items-center gap-2">*/}
+        {/*  <RoleSwitcher />*/}
+        {/*</div>*/}
       </div>
     </div>
   );

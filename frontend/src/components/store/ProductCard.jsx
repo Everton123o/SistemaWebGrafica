@@ -49,17 +49,17 @@ export function ProductCard({ service }) {
           {service.name}
         </h3>
 
-        {/* Rating Stars */}
-        <div className="flex items-center gap-1.5 mt-2">
-          <div className="flex text-amber-400">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} className="w-3 h-3 fill-current" />
-            ))}
-          </div>
-          <span className="text-[11px] text-gray-500 font-medium">
-            ({service.reviewCount})
-          </span>
-        </div>
+        {/*/!* Rating Stars *!/*/}
+        {/*<div className="flex items-center gap-1.5 mt-2">*/}
+        {/*  <div className="flex text-amber-400">*/}
+        {/*    {[...Array(5)].map((_, i) => (*/}
+        {/*      <Star key={i} className="w-3 h-3 fill-current" />*/}
+        {/*    ))}*/}
+        {/*  </div>*/}
+        {/*  <span className="text-[11px] text-gray-500 font-medium">*/}
+        {/*    ({service.reviewCount})*/}
+        {/*  </span>*/}
+        {/*</div>*/}
 
         {/* Description snippet */}
         <p className="text-xs text-gray-500 mt-2 line-clamp-2 leading-relaxed">

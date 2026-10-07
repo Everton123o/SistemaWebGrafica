@@ -35,7 +35,7 @@ export function ProductShowcase() {
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
         <div>
           <h2 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-amber-500" />
+            {/*<Trophy className="w-5 h-5 text-amber-500" />*/}
             Produtos em Destaque
           </h2>
           <p className="text-xs text-gray-500 mt-0.5">

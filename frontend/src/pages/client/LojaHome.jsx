@@ -21,9 +21,9 @@ export function LojaHome() {
       {/* 3. Promotional Strip / Tarja GIV Online style */}
       <div className="w-full bg-gradient-to-r from-brand-navy via-slate-900 to-brand-dark rounded-2xl p-4 sm:p-5 text-white shadow-md flex flex-col sm:flex-row items-center justify-between gap-4 border border-brand-cyan/20">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#ffdd00] text-gray-950 flex items-center justify-center font-black flex-shrink-0">
-            <Sparkles className="w-5 h-5" />
-          </div>
+          {/*<div className="w-10 h-10 rounded-xl bg-[#ffdd00] text-gray-950 flex items-center justify-center font-black flex-shrink-0">*/}
+          {/*  <Sparkles className="w-5 h-5" />*/}
+          {/*</div>*/}
           <div>
             <h3 className="font-extrabold text-sm sm:text-base text-white">
               Checagem Pré-Impressão Inclusa em Todos os Pedidos
@@ -42,15 +42,15 @@ export function LojaHome() {
           <ArrowRight className="w-3.5 h-3.5" />
         </button>
       </div>
-
-      {/* 4. Real-time Price Calculator Simulator Widget */}
-      <PriceCalculatorWidget />
+{/*colocar algo bonitinho*/}
+      {/*/!* 4. Real-time Price Calculator Simulator Widget *!/*/}
+      {/*<PriceCalculatorWidget />*/}
 
       {/* 5. Product Showcase Grid (Mais Vendidos, Banners, Adesivos, Brindes) */}
       <ProductShowcase />
 
       {/* 6. Trust Section ("Precisou? Achou!") */}
-      <TrustSection />
+      {/*<TrustSection />*/}
     </div>
   );
 }

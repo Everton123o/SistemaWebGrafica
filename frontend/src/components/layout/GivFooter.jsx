@@ -5,49 +5,6 @@ export function GivFooter() {
   return (
     <footer className="w-full bg-[#0b1120] text-gray-400 text-xs border-t border-gray-800 pt-12 pb-8 mt-16 font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        
-        {/* Top Badges: GIV Online style trust bar */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pb-10 border-b border-gray-800/80 text-white">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-brand-navy/60 border border-brand-cyan/20 flex items-center justify-center text-brand-cyan flex-shrink-0">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
-            <div>
-              <h4 className="font-bold text-xs text-white">Checagem Profissional Grátis</h4>
-              <p className="text-[11px] text-gray-400 mt-0.5">Validamos sangria, CMYK e resolução antes de rodar.</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-brand-navy/60 border border-brand-cyan/20 flex items-center justify-center text-brand-yellow flex-shrink-0">
-              <Clock className="w-5 h-5" />
-            </div>
-            <div>
-              <h4 className="font-bold text-xs text-white">Produção Rápida 24h</h4>
-              <p className="text-[11px] text-gray-400 mt-0.5">Agilidade garantida para o seu evento ou campanha.</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-brand-navy/60 border border-brand-cyan/20 flex items-center justify-center text-brand-magenta flex-shrink-0">
-              <Award className="w-5 h-5" />
-            </div>
-            <div>
-              <h4 className="font-bold text-xs text-white">Qualidade Gráfica Impecável</h4>
-              <p className="text-[11px] text-gray-400 mt-0.5">Parque gráfico moderno e cores ultra fiéis.</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-brand-navy/60 border border-brand-cyan/20 flex items-center justify-center text-emerald-400 flex-shrink-0">
-              <CreditCard className="w-5 h-5" />
-            </div>
-            <div>
-              <h4 className="font-bold text-xs text-white">Pix & Cartão até 12x</h4>
-              <p className="text-[11px] text-gray-400 mt-0.5">Pague com segurança e parcelamento facilitado.</p>
-            </div>
-          </div>
-        </div>
 
         {/* Main Footer Links */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 py-10">
@@ -81,36 +38,40 @@ export function GivFooter() {
             </div>
           </div>
 
-          {/* Col 2: Departamentos */}
-          <div>
-            <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-3">
-              Produtos & Serviços
-            </h4>
-            <ul className="space-y-2 text-gray-400">
-              <li><span className="hover:text-white cursor-pointer transition">Cartões de Visita Couché 300g</span></li>
-              <li><span className="hover:text-white cursor-pointer transition">Banners & Lonas com Acabamento</span></li>
-              <li><span className="hover:text-white cursor-pointer transition">Adesivos em Vinil & Lacres Delivery</span></li>
-              <li><span className="hover:text-white cursor-pointer transition">Copos Long Drink & Taças Personalizadas</span></li>
-              <li><span className="hover:text-white cursor-pointer transition">Wind Banners Promocionais</span></li>
-              <li><span className="hover:text-white cursor-pointer transition">Folhetos, Panfletos & Folders</span></li>
-              <li><span className="hover:text-white cursor-pointer transition">Pastas Corporativas & Envelopes</span></li>
-            </ul>
-          </div>
+          adicionar menu de navegacao
+          localizacao
+          juntar os contatos
 
-          {/* Col 3: Dúvidas & Instruções Técnicas */}
-          <div>
-            <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-3">
-              Instruções Técnicas
-            </h4>
-            <ul className="space-y-2 text-gray-400">
-              <li><span className="hover:text-white cursor-pointer transition">Como Enviar Arquivo em PDF/X-1a</span></li>
-              <li><span className="hover:text-white cursor-pointer transition">Guia de Sangria & Margens de Segurança</span></li>
-              <li><span className="hover:text-white cursor-pointer transition">Conversão de Cores RGB para CMYK</span></li>
-              <li><span className="hover:text-white cursor-pointer transition">Prazos de Produção & Balcão de Retirada</span></li>
-              <li><span className="hover:text-white cursor-pointer transition">Garantia de Qualidade & Reimpressão</span></li>
-              <li><span className="hover:text-white cursor-pointer transition">Termos de Uso e Política de Privacidade</span></li>
-            </ul>
-          </div>
+          {/*/!* Col 2: Departamentos *!/*/}
+          {/*<div>*/}
+          {/*  <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-3">*/}
+          {/*    Produtos & Serviços*/}
+          {/*  </h4>*/}
+          {/*  <ul className="space-y-2 text-gray-400">*/}
+          {/*    <li><span className="hover:text-white cursor-pointer transition">Cartões de Visita Couché 300g</span></li>*/}
+          {/*    <li><span className="hover:text-white cursor-pointer transition">Banners & Lonas com Acabamento</span></li>*/}
+          {/*    <li><span className="hover:text-white cursor-pointer transition">Adesivos em Vinil & Lacres Delivery</span></li>*/}
+          {/*    <li><span className="hover:text-white cursor-pointer transition">Copos Long Drink & Taças Personalizadas</span></li>*/}
+          {/*    <li><span className="hover:text-white cursor-pointer transition">Wind Banners Promocionais</span></li>*/}
+          {/*    <li><span className="hover:text-white cursor-pointer transition">Folhetos, Panfletos & Folders</span></li>*/}
+          {/*    <li><span className="hover:text-white cursor-pointer transition">Pastas Corporativas & Envelopes</span></li>*/}
+          {/*  </ul>*/}
+          {/*</div>*/}
+
+          {/*/!* Col 3: Dúvidas & Instruções Técnicas *!/*/}
+          {/*<div>*/}
+          {/*  <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-3">*/}
+          {/*    Instruções Técnicas*/}
+          {/*  </h4>*/}
+          {/*  <ul className="space-y-2 text-gray-400">*/}
+          {/*    <li><span className="hover:text-white cursor-pointer transition">Como Enviar Arquivo em PDF/X-1a</span></li>*/}
+          {/*    <li><span className="hover:text-white cursor-pointer transition">Guia de Sangria & Margens de Segurança</span></li>*/}
+          {/*    <li><span className="hover:text-white cursor-pointer transition">Conversão de Cores RGB para CMYK</span></li>*/}
+          {/*    <li><span className="hover:text-white cursor-pointer transition">Prazos de Produção & Balcão de Retirada</span></li>*/}
+          {/*    <li><span className="hover:text-white cursor-pointer transition">Garantia de Qualidade & Reimpressão</span></li>*/}
+          {/*    <li><span className="hover:text-white cursor-pointer transition">Termos de Uso e Política de Privacidade</span></li>*/}
+          {/*  </ul>*/}
+          {/*</div>*/}
 
           {/* Col 4: Atendimento & Localização */}
           <div className="space-y-2.5">
@@ -139,16 +100,16 @@ export function GivFooter() {
               <p className="text-gray-300">contato@printprografica.com.br</p>
             </div>
 
-            <div className="pt-2">
-              <p className="text-[11px] text-gray-400 mb-1 font-semibold">Formas de Pagamento:</p>
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="px-2 py-0.5 rounded bg-gray-800 text-gray-300 font-bold text-[10px]">PIX (5% OFF)</span>
-                <span className="px-2 py-0.5 rounded bg-gray-800 text-gray-300 text-[10px]">Mastercard</span>
-                <span className="px-2 py-0.5 rounded bg-gray-800 text-gray-300 text-[10px]">Visa</span>
-                <span className="px-2 py-0.5 rounded bg-gray-800 text-gray-300 text-[10px]">Elo</span>
-                <span className="px-2 py-0.5 rounded bg-gray-800 text-gray-300 text-[10px]">Boleto</span>
-              </div>
-            </div>
+            {/*<div className="pt-2">*/}
+            {/*  <p className="text-[11px] text-gray-400 mb-1 font-semibold">Formas de Pagamento:</p>*/}
+            {/*  <div className="flex items-center gap-1.5 flex-wrap">*/}
+            {/*    <span className="px-2 py-0.5 rounded bg-gray-800 text-gray-300 font-bold text-[10px]">PIX (5% OFF)</span>*/}
+            {/*    <span className="px-2 py-0.5 rounded bg-gray-800 text-gray-300 text-[10px]">Mastercard</span>*/}
+            {/*    <span className="px-2 py-0.5 rounded bg-gray-800 text-gray-300 text-[10px]">Visa</span>*/}
+            {/*    <span className="px-2 py-0.5 rounded bg-gray-800 text-gray-300 text-[10px]">Elo</span>*/}
+            {/*    <span className="px-2 py-0.5 rounded bg-gray-800 text-gray-300 text-[10px]">Boleto</span>*/}
+            {/*  </div>*/}
+            {/*</div>*/}
 
           </div>
 

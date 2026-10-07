@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Sparkles, ArrowRight, ShieldCheck, Zap } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import fotosImage from '../../../img/WhatsApp Image 2026-10-06 at 22.45.01.jpeg';
+import calendariosImage from '../../../img/WhatsApp Image 2026-10-06 at 22.45.01 (1).jpeg';
+import impressoraImage from '../../../img/WhatsApp Image 2026-10-06 at 22.45.01 (2).jpeg';
+import marcadoresImage from '../../../img/WhatsApp Image 2026-10-06 at 22.45.01 (3).jpeg';
 
 export function HeroCarousel() {
   const { navigateTo } = useApp();
@@ -9,7 +13,7 @@ export function HeroCarousel() {
   const slides = [
     {
       id: 1,
-      badge: 'PROMOÇÃO DE LANÇAMENTO',
+      // badge: 'PROMOÇÃO DE LANÇAMENTO',
       title: 'Sua Gráfica Rápida e Parceira em Delmiro Gouveia',
       subtitle: 'Cartões de visita, folhetos, adesivos e banners com cores fiéis, checagem técnica e entrega expressa.',
       cta: 'Ver Produtos em Oferta',
@@ -17,11 +21,11 @@ export function HeroCarousel() {
       bgGradient: 'from-slate-900 via-brand-dark to-brand-navy',
       tagline: '10% OFF na Primeira Compra com cupom BEMVINDOPRINT10',
       accentColor: 'text-brand-yellow',
-      image: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80'
+      image: impressoraImage
     },
     {
       id: 2,
-      badge: 'EXCLUSIVIDADE PRINTPRO',
+      // badge: 'EXCLUSIVIDADE PRINTPRO',
       title: 'Copos & Taças Personalizadas para Eventos',
       subtitle: 'Long Drink, Taças de Gin e Copos Twister com estampa colorida de alta fixação para aniversários, formaturas e casamentos.',
       cta: 'Personalizar Meus Copos',
@@ -29,11 +33,11 @@ export function HeroCarousel() {
       bgGradient: 'from-slate-900 via-purple-950 to-pink-950',
       tagline: 'Destaque no Instagram @printpro_grafica.dg',
       accentColor: 'text-pink-400',
-      image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80'
+      image: calendariosImage
     },
     {
       id: 3,
-      badge: 'SEGURANÇA & DELIVERY',
+      // badge: 'SEGURANÇA & DELIVERY',
       title: 'Lacres de Segurança e Rótulos em Adesivo Vinil',
       subtitle: 'Proteja suas caixas de pizza, potes e sacolas. Transmita higiene e confiança aos seus clientes.',
       cta: 'Configurar Adesivos',
@@ -41,7 +45,7 @@ export function HeroCarousel() {
       bgGradient: 'from-slate-900 via-sky-950 to-blue-900',
       tagline: 'Vinil Brilho, Fosco e Anti-Violação (Casca de Ovo)',
       accentColor: 'text-brand-cyan',
-      image: 'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=800&q=80'
+      image: marcadoresImage
     },
     {
       id: 4,
@@ -53,7 +57,7 @@ export function HeroCarousel() {
       bgGradient: 'from-slate-900 via-gray-900 to-amber-950',
       tagline: 'Acabamento completo com bastão, cordão e ilhós reforçado',
       accentColor: 'text-brand-yellow',
-      image: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=800&q=80'
+      image: fotosImage
     }
   ];
 
@@ -88,10 +92,10 @@ export function HeroCarousel() {
           
           {/* Text Content */}
           <div className="lg:col-span-7 space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs font-bold uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5 text-brand-yellow" />
-              <span>{current.badge}</span>
-            </div>
+            {/*<div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs font-bold uppercase tracking-wider">*/}
+            {/*  <Sparkles className="w-3.5 h-3.5 text-brand-yellow" />*/}
+            {/*  <span>{current.badge}</span>*/}
+            {/*</div>*/}
 
             <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
               {current.title}
@@ -102,7 +106,7 @@ export function HeroCarousel() {
             </p>
 
             <div className="flex items-center gap-2 text-xs font-semibold text-gray-300">
-              <Zap className="w-4 h-4 text-emerald-400" />
+              {/*<Zap className="w-4 h-4 text-emerald-400" />*/}
               <span>{current.tagline}</span>
             </div>
 
