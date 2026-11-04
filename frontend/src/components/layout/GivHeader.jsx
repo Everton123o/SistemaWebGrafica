@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Search, ShoppingCart, MessageCircle, User, Bell, Package, ChevronRight } from 'lucide-react';
+import { Search, ShoppingCart, MessageCircle, User, Bell, Package, ChevronRight, LogOut } from 'lucide-react';
 
 export function GivHeader() {
   const {
@@ -9,7 +9,9 @@ export function GivHeader() {
     navigateTo,
     services,
     orders,
-    cart
+    cart,
+    currentUser,
+    logout
   } = useApp();
 
   const [localSearch, setLocalSearch] = useState('');
@@ -203,6 +205,38 @@ export function GivHeader() {
             {/*    <span>Painel Administrativo</span>*/}
             {/*  </button>*/}
             {/*)}*/}
+
+            {/* Account: login / logged user */}
+            {currentUser ? (
+              <div className="flex items-center gap-1">
+                <div className="hidden sm:flex items-center gap-2 px-2 py-1 text-left">
+                  <div className="w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center">
+                    <User className="w-4 h-4 text-brand-navy" />
+                  </div>
+                  <div className="text-xs leading-tight">
+                    <span className="text-gray-500 block text-[10px]">Olá,</span>
+                    <span className="font-bold text-gray-900">{currentUser.name.split(' ')[0]}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={logout}
+                  className="p-2 rounded-full text-gray-500 hover:text-rose-600 hover:bg-rose-50 transition"
+                  title="Sair da conta"
+                  aria-label="Sair da conta"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => navigateTo('login')}
+                className="flex items-center gap-2 px-3 py-2 rounded-full border border-gray-300 hover:border-giv-purple hover:text-giv-purple text-gray-800 font-semibold text-xs transition"
+                title="Entrar na minha conta"
+              >
+                <User className="w-4 h-4" />
+                <span className="hidden sm:inline">Entrar</span>
+              </button>
+            )}
 
             {/* Shopping Cart Pill */}
             <button

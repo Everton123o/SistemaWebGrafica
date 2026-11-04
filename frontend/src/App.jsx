@@ -6,6 +6,10 @@ import { GivNavbar } from './components/layout/GivNavbar';
 import { GivFooter } from './components/layout/GivFooter';
 import { ToastContainer } from './components/common/Toast';
 
+// Auth Pages
+import { Login } from './pages/auth/Login';
+import { Cadastro } from './pages/auth/Cadastro';
+
 // Client Pages
 import { LojaHome } from './pages/client/LojaHome';
 import { Catalogo } from './pages/client/Catalogo';
@@ -72,6 +76,16 @@ function MainRouter() {
         return <LojaHome />;
     }
   };
+
+  // Auth screens are standalone, without the store header/navbar/footer
+  if (currentView === 'login' || currentView === 'cadastro') {
+    return (
+      <>
+        {currentView === 'login' ? <Login /> : <Cadastro />}
+        <ToastContainer />
+      </>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f8fafc] text-gray-900 font-sans selection:bg-brand-cyan selection:text-white">
