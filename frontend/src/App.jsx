@@ -32,7 +32,14 @@ import { AdminServicos } from './pages/admin/AdminServicos';
 import { AdminPrecos } from './pages/admin/AdminPrecos';
 
 function MainRouter() {
-  const { currentView } = useApp();
+  const { currentView, currentUser, authLoading } = useApp();
+  if (authLoading) return <div role="status" className="p-8 text-center">Verificando sessão...</div>;
+  const publicViews = ['home', 'catalogo', 'login', 'cadastro'];
+  if (!currentUser && !publicViews.includes(currentView)) return <Login />;
+  if ((currentView.startsWith('admin-') && currentUser?.role !== 'ADMINISTRADOR') ||
+      (currentView.startsWith('resp-') && currentUser?.role !== 'RESPONSAVEL_GRAFICA')) {
+    return <div role="alert" className="p-8">Acesso restrito ao perfil autorizado.</div>;
+  }
 
   const renderCurrentView = () => {
     switch (currentView) {

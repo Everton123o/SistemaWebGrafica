@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     jwt_secret: str | None = None
     jwt_algorithm: str = "HS256"
     jwt_expire_minutes: int = 30
+    cors_origins: list[str] = []
 
     model_config = SettingsConfigDict(
         env_file=".env",

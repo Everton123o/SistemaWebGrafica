@@ -12,13 +12,6 @@ import {
   MailCheck
 } from 'lucide-react';
 
-// Contas de demonstração (dados mockados) para facilitar os testes por perfil
-const DEMO_ACCOUNTS = [
-  { label: 'Cliente', email: 'carlos@hamburgueriadelmiro.com.br' },
-  { label: 'Responsável', email: 'lucas.preimpressao@printpro.com.br' },
-  { label: 'Administrador', email: 'admin@printpro.com.br' }
-];
-
 function AppleIcon(props) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
@@ -106,35 +99,22 @@ export function Login() {
     setRecoverySent(false);
   };
 
-  // Simula a latência de uma requisição enquanto a API de autenticação não existe
-  const withLoading = (action) => {
-    setLoading(true);
-    setError('');
-    setTimeout(() => {
-      action();
-      setLoading(false);
-    }, 600);
-  };
-
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    if (loading) return;
     if (!isValidEmail(email)) return setError('Digite um e-mail válido.');
     if (!password) return setError('Digite sua senha.');
-
-    withLoading(() => {
-      const result = login(email, password);
+    setLoading(true);
+    setError('');
+    try {
+      const result = await login(email, password);
       if (!result.ok) setError(result.error);
-    });
+    } finally { setLoading(false); }
   };
 
   const handleRecover = (e) => {
     e.preventDefault();
-    if (!isValidEmail(email)) return setError('Digite um e-mail válido.');
-
-    withLoading(() => {
-      setRecoverySent(true);
-      addToast('Se o e-mail estiver cadastrado, você receberá as instruções de recuperação.', 'info');
-    });
+    setError('Recuperação de senha ainda indisponível. Entre em contato com a gráfica.');
   };
 
   const handleSocialLogin = (provider) => {
@@ -238,28 +218,7 @@ export function Login() {
               </button>
             </p>
 
-            {/* Demo accounts (mock data) */}
-            <div className="mt-10 rounded-lg border border-dashed border-gray-200 bg-gray-50/60 p-3">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 text-center mb-2">
-                Acesso de demonstração
-              </p>
-              <div className="flex flex-wrap justify-center gap-1.5">
-                {DEMO_ACCOUNTS.map(account => (
-                  <button
-                    key={account.email}
-                    type="button"
-                    onClick={() => {
-                      setEmail(account.email);
-                      setPassword('demo1234');
-                      setError('');
-                    }}
-                    className="px-2.5 py-1 rounded-full bg-white border border-gray-200 text-xs font-medium text-gray-700 hover:border-giv-purple hover:text-giv-purple transition"
-                  >
-                    {account.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+
           </>
         )}
 

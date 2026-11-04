@@ -1,13 +1,13 @@
 """User endpoints."""
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.api.dependencies import DatabaseSession
+from app.api.dependencies import DatabaseSession, require_admin
 from app.schemas.user import UserCreate, UserRead
 from app.services.user import UserAlreadyExistsError, UserService
 
-router = APIRouter(prefix="/users", tags=["users"])
+router = APIRouter(prefix="/users", tags=["users"], dependencies=[Depends(require_admin)])
 
 
 @router.post("", response_model=UserRead, status_code=status.HTTP_201_CREATED)

@@ -1,6 +1,6 @@
 """Client repository."""
 
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 
 from app.models.client import Client
@@ -15,6 +15,12 @@ class ClientRepository:
 
     def get_by_id(self, client_id: int) -> Client | None:
         return self.session.get(Client, client_id)
+
+    def get_by_document(self, document: str) -> Client | None:
+        normalized = Client.cpf_cnpj
+        for separator in ('.', '-', '/', ' '):
+            normalized = func.replace(normalized, separator, '')
+        return self.session.scalar(select(Client).where(normalized == document))
 
     def create(self, client: Client) -> Client:
         self.session.add(client)

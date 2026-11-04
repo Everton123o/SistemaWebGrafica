@@ -1,3 +1,4 @@
+import { authApi, clearToken, saveToken, getToken, mapUser } from '../services/auth.js';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   INITIAL_SERVICES,
@@ -9,16 +10,15 @@ import {
 
 const AppContext = createContext();
 
-export function AppProvider({ children }) {
-  // Authenticated user session (mock until the backend exposes an auth endpoint)
-  const [currentUser, setCurrentUser] = useState(() => {
-    const saved = localStorage.getItem('printpro_session');
-    return saved ? JSON.parse(saved) : null;
-  });
+const ROLE_HOME_VIEW = {
+    CLIENTE: 'home', RESPONSAVEL_GRAFICA: 'resp-dashboard', ADMINISTRADOR: 'admin-dashboard'
+  };
 
-  // Roles: 'CLIENTE', 'RESPONSAVEL_GRAFICA', 'ADMINISTRADOR'
-  const [currentRole, setCurrentRole] = useState(() => currentUser?.role || 'CLIENTE');
-  
+export function AppProvider({ children }) {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const currentRole = currentUser?.role || 'CLIENTE';
+
   // Navigation
   const [currentView, setCurrentView] = useState('home');
   const [selectedOrderId, setSelectedOrderId] = useState('PRP-1042');
@@ -53,6 +53,24 @@ export function AppProvider({ children }) {
 
   const [cart, setCart] = useState([]);
   const [toasts, setToasts] = useState([]);
+
+  useEffect(() => {
+    let active = true;
+    localStorage.removeItem('printpro_session');
+    const restore = async () => {
+      try {
+        if (getToken()) {
+          const user = mapUser(await authApi.me());
+          if (active) { setCurrentUser(user); setCurrentView(ROLE_HOME_VIEW[user.role]); }
+        }
+      } catch { clearToken(); }
+      finally { if (active) setAuthLoading(false); }
+    };
+    restore();
+    const expired = () => { setCurrentUser(null); setCart([]); setCurrentView('login'); };
+    window.addEventListener('auth:expired', expired);
+    return () => { active = false; window.removeEventListener('auth:expired', expired); };
+  }, []);
 
   // Persist changes
   useEffect(() => {
@@ -96,114 +114,36 @@ export function AppProvider({ children }) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Switch Role
-  const switchRole = (newRole) => {
-    setCurrentRole(newRole);
-    if (newRole === 'CLIENTE') {
-      setCurrentView('home');
-      addToast('Alternado para visão do CLIENTE (Loja & Meus Pedidos)', 'info');
-    } else if (newRole === 'RESPONSAVEL_GRAFICA') {
-      setCurrentView('resp-dashboard');
-      addToast('Alternado para visão do RESPONSÁVEL DA GRÁFICA (Pré-Impressão & Validação)', 'info');
-    } else if (newRole === 'ADMINISTRADOR') {
-      setCurrentView('admin-dashboard');
-      addToast('Alternado para visão do ADMINISTRADOR (Gestão & Configurações)', 'info');
-    }
+  // Profiles come exclusively from the authenticated API response.
+
+
+  const startSession = (result) => {
+    const user = mapUser(result.user);
+    saveToken(result.access_token, result.expires_in);
+    setCurrentUser(user);
+    setCart([]);
+    navigateTo(ROLE_HOME_VIEW[user.role]);
   };
 
-  // ==================== AUTH ACTIONS (MOCK) ====================
-
-  const ROLE_HOME_VIEW = {
-    CLIENTE: 'home',
-    RESPONSAVEL_GRAFICA: 'resp-dashboard',
-    ADMINISTRADOR: 'admin-dashboard'
+  const login = async (email, password) => {
+    try {
+      startSession(await authApi.login({ email: email.trim().toLowerCase(), password }));
+      addToast('Login realizado com sucesso!');
+      return { ok: true };
+    } catch (error) { return { ok: false, error: error.message }; }
   };
 
-  const startSession = (user) => {
-    const session = { id: user.id, name: user.name, email: user.email, role: user.role };
-    setCurrentUser(session);
-    localStorage.setItem('printpro_session', JSON.stringify(session));
-    setCurrentRole(user.role);
-    navigateTo(ROLE_HOME_VIEW[user.role] || 'home');
-  };
-
-  // TODO: substituir pela chamada ao endpoint de autenticação quando estiver disponível no backend.
-  // Enquanto isso, valida apenas se o e-mail pertence a um usuário cadastrado e ativo.
-  const login = (email, password) => {
-    const normalizedEmail = email.trim().toLowerCase();
-    if (!normalizedEmail || !password) {
-      return { ok: false, error: 'Informe seu e-mail e sua senha.' };
-    }
-
-    const user = users.find(u => u.email.toLowerCase() === normalizedEmail);
-    if (!user) {
-      return { ok: false, error: 'Não encontramos uma conta com este e-mail.' };
-    }
-    if (user.status !== 'ATIVO') {
-      return { ok: false, error: 'Esta conta está desativada. Entre em contato com a gráfica.' };
-    }
-
-    startSession(user);
-    addToast(`Bem-vindo(a), ${user.name.split(' ')[0]}!`, 'success');
-    return { ok: true };
-  };
-
-  // Self-service sign-up: creates the CLIENTE user and its client record.
-  // TODO: integrar com POST /users (e cadastro de cliente) quando o frontend consumir a API.
-  const register = ({ personType, document, name, company, email, birthDate, phone, address }) => {
-    const normalizedEmail = email.trim().toLowerCase();
-    if (users.some(u => u.email.toLowerCase() === normalizedEmail)) {
-      return { ok: false, error: 'Já existe um usuário com este e-mail.' };
-    }
-
-    const documentDigits = (document || '').replace(/\D/g, '');
-    if (documentDigits && clients.some(c => (c.document || '').replace(/\D/g, '') === documentDigits)) {
-      return { ok: false, error: 'Já existe um cliente cadastrado com este documento.' };
-    }
-
-    const id = Date.now();
-    const today = new Date().toISOString().split('T')[0];
-
-    const newUser = {
-      id,
-      name: name.trim(),
-      email: normalizedEmail,
-      role: 'CLIENTE',
-      status: 'ATIVO',
-      phone: phone || '',
-      createdAt: today
-    };
-
-    const street = [address?.street?.trim(), address?.number?.trim()].filter(Boolean).join(', ');
-    const newClient = {
-      id,
-      name: name.trim(),
-      company: company?.trim() || '',
-      document: document || '',
-      documentType: personType === 'PJ' ? 'CNPJ' : 'CPF',
-      email: normalizedEmail,
-      phone: phone || '',
-      birthDate: birthDate || '',
-      cep: address?.cep || '',
-      city: address?.city?.trim() || '',
-      state: address?.state || '',
-      address: [street, address?.complement?.trim(), address?.district?.trim()].filter(Boolean).join(' - '),
-      totalOrders: 0,
-      totalSpent: 0,
-      status: 'ATIVO'
-    };
-
-    setUsers(prev => [newUser, ...prev]);
-    setClients(prev => [newClient, ...prev]);
-    startSession(newUser);
-    addToast('Conta criada com sucesso! Bem-vindo(a) à PrintPro.', 'success');
-    return { ok: true };
+  const register = async (data) => {
+    try {
+      startSession(await authApi.register({ ...data, birthDate: data.birthDate || null }));
+      addToast('Conta criada com sucesso!');
+      return { ok: true };
+    } catch (error) { return { ok: false, error: error.message }; }
   };
 
   const logout = () => {
+    clearToken();
     setCurrentUser(null);
-    localStorage.removeItem('printpro_session');
-    setCurrentRole('CLIENTE');
     setCart([]);
     navigateTo('login');
     addToast('Você saiu da sua conta.', 'info');
@@ -591,7 +531,7 @@ export function AppProvider({ children }) {
         register,
         logout,
         currentRole,
-        switchRole,
+        authLoading,
         currentView,
         navigateTo,
         selectedOrderId,

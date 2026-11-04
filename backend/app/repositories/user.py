@@ -13,6 +13,9 @@ class UserRepository:
     def get_by_id(self, user_id: int) -> User | None:
         return self.session.get(User, user_id)
 
+    def rollback(self) -> None:
+        self.session.rollback()
+
     def get_by_email(self, email: str) -> User | None:
         return self.session.scalar(select(User).where(User.email == email))
 

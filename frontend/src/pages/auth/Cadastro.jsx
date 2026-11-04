@@ -111,7 +111,7 @@ function SummarySection({ title, onEdit, rows }) {
 }
 
 export function Cadastro() {
-  const { register, navigateTo, users, clients } = useApp();
+  const { register, navigateTo } = useApp();
 
   const [step, setStep] = useState(0);
   const [form, setForm] = useState(INITIAL_FORM);
@@ -154,17 +154,9 @@ export function Cadastro() {
         if (!form.name.trim()) e.name = 'Informe o nome do responsável.';
       }
 
-      const documentDigits = onlyDigits(isPF ? form.cpf : form.cnpj);
-      const documentField = isPF ? 'cpf' : 'cnpj';
-      if (!e[documentField] && clients.some(c => onlyDigits(c.document) === documentDigits)) {
-        e[documentField] = `Já existe uma conta com este ${isPF ? 'CPF' : 'CNPJ'}.`;
-      }
-
       if (!form.email.trim()) e.email = 'Informe seu e-mail.';
       else if (!isValidEmail(form.email)) e.email = 'E-mail inválido.';
-      else if (users.some(u => u.email.toLowerCase() === form.email.trim().toLowerCase())) {
-        e.email = 'Já existe uma conta com este e-mail.';
-      }
+
 
       if (form.phone && !isValidPhone(form.phone)) e.phone = 'Celular inválido.';
     }
@@ -212,8 +204,9 @@ export function Cadastro() {
     setStep(target);
   };
 
-  const handleCreateAccount = (event) => {
+  const handleCreateAccount = async (event) => {
     event.preventDefault();
+    if (loading) return;
 
     // Revalida todas as etapas antes de concluir
     for (let i = 0; i < 3; i++) {
@@ -225,9 +218,8 @@ export function Cadastro() {
 
     setLoading(true);
     setSubmitError('');
-    // Simula a latência de uma requisição enquanto a API de cadastro não está integrada
-    setTimeout(() => {
-      const result = register({
+    try {
+      const result = await register({
         personType: form.personType,
         document: isPF ? form.cpf : form.cnpj,
         name: form.name,
@@ -246,9 +238,8 @@ export function Cadastro() {
         },
         password: form.password
       });
-      setLoading(false);
       if (!result.ok) setSubmitError(result.error);
-    }, 700);
+    } finally { setLoading(false); }
   };
 
   const passwordToggle = (
