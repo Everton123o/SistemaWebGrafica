@@ -56,6 +56,17 @@ Antes de iniciar a API, execute `alembic upgrade head`.
 
 O cadastro público nunca cria administradores ou funcionários. Contas desses
 perfis devem ser provisionadas por um administrador existente.
+
+Para criar o primeiro administrador, execute a partir de `backend`:
+
+```powershell
+python -m scripts.create_initial_admin
+```
+
+O script pede a senha sem exibi-la, cria somente o e-mail ainda inexistente e
+armazena apenas o hash. Para automação, use `INITIAL_ADMIN_EMAIL`,
+`INITIAL_ADMIN_NAME` e `INITIAL_ADMIN_PASSWORD` no ambiente, sem versionar esses
+valores.
 Os tokens expiram em `JWT_EXPIRE_MINUTES` (30 por padrão). O logout remove o
 token do navegador; tokens já emitidos permanecem válidos até sua expiração.
 
