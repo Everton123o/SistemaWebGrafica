@@ -10,7 +10,7 @@ class UserCreate(BaseModel):
     name: str = Field(min_length=1, max_length=120)
     email: str = Field(min_length=3, max_length=255)
     password: str = Field(min_length=8, max_length=128)
-    role: Literal["admin", "employee", "client"] = "client"
+    role: Literal["admin", "employee"] = "employee"
     phone: str = Field(default="", max_length=30)
 
 

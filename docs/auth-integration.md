@@ -29,5 +29,9 @@ Pedidos, catálogo e gerenciamento visual de usuários/clientes continuam usando
 os mocks existentes, fora do escopo desta integração. Criar um usuário no painel
 mockado não cria uma conta para login; use o cadastro público ou a API autorizada.
 
+O gerenciador de usuários cria apenas administradores e responsáveis da gráfica.
+Contas de clientes são criadas pelo cadastro público junto com seu perfil de
+cliente; contas `client` existentes continuam visíveis para consulta.
+
 Verificações: `python -m pytest` no backend; `npm.cmd test`, `npm.cmd run build`
 e `npm.cmd run lint` no frontend.

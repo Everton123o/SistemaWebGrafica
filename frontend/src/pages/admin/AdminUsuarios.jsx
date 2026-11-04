@@ -27,7 +27,7 @@ export function AdminUsuarios() {
     setEditingUserId(null);
     setUserName('');
     setUserEmail('');
-    setUserRole('CLIENTE');
+    setUserRole('RESPONSAVEL_GRAFICA');
     setUserPhone('');
     setUserPassword('');
     setActionError('');
@@ -269,7 +269,9 @@ export function AdminUsuarios() {
                 onChange={(e) => setUserRole(e.target.value)}
                 className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl font-bold"
               >
-                <option value="CLIENTE">CLIENTE</option>
+                {editingUserId && userRole === 'CLIENTE' && (
+                  <option value="CLIENTE">CLIENTE (conta existente)</option>
+                )}
                 <option value="RESPONSAVEL_GRAFICA">RESPONSAVEL_GRAFICA (Técnico)</option>
                 <option value="ADMINISTRADOR">ADMINISTRADOR (Master)</option>
               </select>
