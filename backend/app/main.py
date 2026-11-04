@@ -10,9 +10,14 @@ from app.api import api_router
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
     application = FastAPI(title="Sistema Web para Gráfica")
-    application.add_middleware(CORSMiddleware, allow_origins=get_settings().cors_origins,
-                               allow_methods=["GET", "POST"],
-                               allow_headers=["Authorization", "Content-Type"])
+    settings = get_settings()
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origins,
+        allow_credentials=False,
+        allow_methods=["GET", "POST", "OPTIONS"],
+        allow_headers=["Authorization", "Content-Type", "ngrok-skip-browser-warning"],
+    )
     application.include_router(api_router)
     return application
 

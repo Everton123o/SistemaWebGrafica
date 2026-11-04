@@ -1,3 +1,5 @@
+// Set VITE_API_URL to the public API tunnel when frontend and API use separate
+// ngrok URLs. The /api default keeps the local Vite proxy working.
 const API_URL = (import.meta.env?.VITE_API_URL || '/api').replace(/\/$/, '');
 const TOKEN_KEY = 'printpro_token';
 let expiryTimer;
@@ -29,6 +31,7 @@ export function mapUser(user) {
 
 export async function apiRequest(path, { method = 'GET', body, authenticated = true } = {}) {
   const headers = { 'Content-Type': 'application/json' };
+  if (API_URL.includes('ngrok')) headers['ngrok-skip-browser-warning'] = 'true';
   if (authenticated && getToken()) headers.Authorization = `Bearer ${getToken()}`;
   let response;
   try {
