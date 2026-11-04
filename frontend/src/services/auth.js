@@ -29,6 +29,36 @@ export function mapUser(user) {
   return { ...user, role: roles[user.role] };
 }
 
+export function mapClient(client) {
+  const details = client.registration_details || {};
+  return {
+    id: client.id,
+    userId: client.user_id,
+    name: client.name,
+    company: details.company || '',
+    document: client.cpf_cnpj,
+    documentType: details.person_type === 'PJ' ? 'CNPJ' : 'CPF',
+    email: client.email,
+    phone: client.phone,
+    address: client.address,
+    city: details.city || '',
+    state: details.state || '',
+    createdAt: client.created_at,
+    status: 'ATIVO'
+  };
+}
+
+export function mapAdminUser(user) {
+  const roles = { client: 'CLIENTE', employee: 'RESPONSAVEL_GRAFICA', admin: 'ADMINISTRADOR' };
+  return {
+    ...user,
+    role: roles[user.role] || user.role,
+    status: user.is_active ? 'ATIVO' : 'INATIVO',
+    createdAt: user.created_at,
+    phone: user.phone || ''
+  };
+}
+
 export async function apiRequest(path, { method = 'GET', body, authenticated = true } = {}) {
   const headers = { 'Content-Type': 'application/json' };
   if (API_URL.includes('ngrok')) headers['ngrok-skip-browser-warning'] = 'true';
@@ -62,4 +92,14 @@ export const authApi = {
     expiryTimer = setTimeout(expire, remaining);
     return user;
   }
+};
+
+export const clientApi = {
+  list: async () => (await apiRequest('/clients')).map(mapClient)
+};
+
+export const userApi = {
+  list: async () => (await apiRequest('/users')).map(mapAdminUser),
+  create: async (user) => mapAdminUser(await apiRequest('/users', { method: 'POST', body: user })),
+  update: async (id, user) => mapAdminUser(await apiRequest(`/users/${id}`, { method: 'PATCH', body: user }))
 };

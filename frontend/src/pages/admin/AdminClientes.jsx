@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 
 export function AdminClientes() {
-  const { clients, orders, addClient, updateClient } = useApp();
+  const { clients, clientsLoading, clientsError, orders, addClient, updateClient } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
@@ -142,6 +142,9 @@ export function AdminClientes() {
             Total cadastrado: <strong>{filtered.length} cliente(s)</strong>
           </span>
         </div>
+
+        {clientsLoading && <p className="mt-3 text-xs text-gray-500">Carregando clientes do banco de dados...</p>}
+        {clientsError && <p role="alert" className="mt-3 text-xs text-rose-600">Não foi possível carregar os clientes: {clientsError}</p>}
       </div>
 
       {/* Clients Cards Grid */}

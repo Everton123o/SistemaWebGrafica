@@ -46,7 +46,7 @@ class AuthService:
         if self.clients.get_by_document(data.document):
             raise DocumentAlreadyExistsError
         user = User(name=data.name, email=data.email,
-                    password_hash=hash_password(data.password), role="client")
+                    password_hash=hash_password(data.password), role="client", phone=data.phone)
         user.client_profile = Client(
             name=data.company or data.name, cpf_cnpj=data.document,
             email=data.email, phone=data.phone,

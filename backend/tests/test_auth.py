@@ -107,6 +107,28 @@ def test_company_registration_and_duplicate_document(api):
     assert client.post('/auth/register', json={**data, 'email': 'other@example.com'}).status_code == 409
 
 
+def test_admin_can_create_update_and_disable_users(api):
+    client, session = api
+    client_token = client.post('/auth/register', json=payload()).json()['access_token']
+    admin = session.scalar(select(User))
+    admin.role = 'admin'
+    session.commit()
+    auth = {'Authorization': 'Bearer ' + client_token}
+    created = client.post('/users', headers=auth, json={
+        'name': 'Operador', 'email': 'operador@example.com',
+        'password': 'senha-operador', 'role': 'employee'
+    })
+    assert created.status_code == 201, created.text
+    user_id = created.json()['id']
+    assert client.get('/users', headers=auth).status_code == 200
+    updated = client.patch(f'/users/{user_id}', headers=auth,
+                           json={'name': 'Operador Atualizado', 'is_active': False})
+    assert updated.status_code == 200
+    assert updated.json()['name'] == 'Operador Atualizado'
+    assert updated.json()['is_active'] is False
+    assert client.patch('/users/999999', headers=auth, json={'name': 'X'}).status_code == 404
+
+
 def test_customer_persistence_failure_rolls_back_user(api):
     client, session = api
 

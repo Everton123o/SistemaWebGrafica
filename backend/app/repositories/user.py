@@ -13,6 +13,9 @@ class UserRepository:
     def get_by_id(self, user_id: int) -> User | None:
         return self.session.get(User, user_id)
 
+    def list(self) -> list[User]:
+        return list(self.session.scalars(select(User).order_by(User.id)).all())
+
     def rollback(self) -> None:
         self.session.rollback()
 
@@ -21,6 +24,11 @@ class UserRepository:
 
     def create(self, user: User) -> User:
         self.session.add(user)
+        self.session.commit()
+        self.session.refresh(user)
+        return user
+
+    def save(self, user: User) -> User:
         self.session.commit()
         self.session.refresh(user)
         return user

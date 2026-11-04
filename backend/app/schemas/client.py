@@ -1,7 +1,7 @@
 """Client API schemas."""
 
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -25,4 +25,5 @@ class ClientRead(BaseModel):
     phone: str
     email: str
     address: str
+    registration_details: Optional[dict[str, Any]] = None
     created_at: datetime

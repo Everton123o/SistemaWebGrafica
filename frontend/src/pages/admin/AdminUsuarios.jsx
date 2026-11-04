@@ -4,7 +4,7 @@ import { Modal } from '../../components/common/Modal';
 import { Users, UserPlus, Edit2, Shield, Wrench, User, Power, Search, CheckCircle2 } from 'lucide-react';
 
 export function AdminUsuarios() {
-  const { users, addUser, updateUser, toggleUserStatus } = useApp();
+  const { users, usersLoading, usersError, createUserFromApi, editUserFromApi, setUserActiveFromApi } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUserId, setEditingUserId] = useState(null);
@@ -14,6 +14,8 @@ export function AdminUsuarios() {
   const [userEmail, setUserEmail] = useState('');
   const [userRole, setUserRole] = useState('CLIENTE');
   const [userPhone, setUserPhone] = useState('');
+  const [userPassword, setUserPassword] = useState('');
+  const [actionError, setActionError] = useState('');
 
   const filteredUsers = users.filter(u =>
     u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -27,6 +29,8 @@ export function AdminUsuarios() {
     setUserEmail('');
     setUserRole('CLIENTE');
     setUserPhone('');
+    setUserPassword('');
+    setActionError('');
     setIsModalOpen(true);
   };
 
@@ -36,27 +40,31 @@ export function AdminUsuarios() {
     setUserEmail(user.email);
     setUserRole(user.role);
     setUserPhone(user.phone || '');
+    setUserPassword('');
+    setActionError('');
     setIsModalOpen(true);
   };
 
-  const handleSaveUser = (e) => {
+  const handleSaveUser = async (e) => {
     e.preventDefault();
-    if (editingUserId) {
-      updateUser(editingUserId, {
-        name: userName,
-        email: userEmail,
-        role: userRole,
-        phone: userPhone
-      });
-    } else {
-      addUser({
-        name: userName,
-        email: userEmail,
-        role: userRole,
-        phone: userPhone
-      });
+    setActionError('');
+    try {
+      const role = { CLIENTE: 'client', RESPONSAVEL_GRAFICA: 'employee', ADMINISTRADOR: 'admin' }[userRole];
+      if (editingUserId) {
+        await editUserFromApi(editingUserId, {
+          name: userName,
+          email: userEmail,
+          phone: userPhone,
+          role,
+          ...(userPassword ? { password: userPassword } : {})
+        });
+      } else {
+        await createUserFromApi({ name: userName, email: userEmail, phone: userPhone, role, password: userPassword });
+      }
+      setIsModalOpen(false);
+    } catch (error) {
+      setActionError(error.message);
     }
-    setIsModalOpen(false);
   };
 
   return (
@@ -100,6 +108,9 @@ export function AdminUsuarios() {
             Total: <strong>{filteredUsers.length} usuário(s)</strong>
           </span>
         </div>
+
+        {usersLoading && <p className="mt-3 text-xs text-gray-500">Carregando usuários do banco de dados...</p>}
+        {usersError && <p role="alert" className="mt-3 text-xs text-rose-600">Não foi possível carregar os usuários: {usersError}</p>}
       </div>
 
       {/* Users Table */}
@@ -180,7 +191,7 @@ export function AdminUsuarios() {
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
                         <button
-                          onClick={() => toggleUserStatus(user.id)}
+                          onClick={() => setUserActiveFromApi(user.id).catch((error) => setActionError(error.message))}
                           className={`p-1.5 rounded-lg transition ${
                             isActive
                               ? 'text-gray-400 hover:text-rose-600 hover:bg-rose-50'
@@ -233,6 +244,21 @@ export function AdminUsuarios() {
             />
           </div>
 
+          <div>
+            <label className="block font-bold text-gray-700 uppercase tracking-wider mb-1">
+              {editingUserId ? 'Nova senha (opcional)' : 'Senha de acesso'}
+            </label>
+            <input
+              type="password"
+              value={userPassword}
+              onChange={(e) => setUserPassword(e.target.value)}
+              minLength={8}
+              required={!editingUserId}
+              placeholder="Mínimo de 8 caracteres"
+              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl"
+            />
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block font-bold text-gray-700 uppercase tracking-wider mb-1">
@@ -264,6 +290,7 @@ export function AdminUsuarios() {
           </div>
 
           <div className="flex justify-end gap-2 pt-3 border-t border-gray-100">
+            {actionError && <p role="alert" className="mr-auto self-center text-xs text-rose-600">{actionError}</p>}
             <button
               type="button"
               onClick={() => setIsModalOpen(false)}

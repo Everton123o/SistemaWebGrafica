@@ -1,4 +1,4 @@
-import { authApi, clearToken, saveToken, getToken, mapUser } from '../services/auth.js';
+import { authApi, clientApi, userApi, clearToken, saveToken, getToken, mapUser } from '../services/auth.js';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   INITIAL_SERVICES,
@@ -40,11 +40,15 @@ export function AppProvider({ children }) {
     const saved = localStorage.getItem('printpro_users');
     return saved ? JSON.parse(saved) : INITIAL_USERS;
   });
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [usersError, setUsersError] = useState('');
 
   const [clients, setClients] = useState(() => {
     const saved = localStorage.getItem('printpro_clients');
     return saved ? JSON.parse(saved) : INITIAL_CLIENTS;
   });
+  const [clientsLoading, setClientsLoading] = useState(false);
+  const [clientsError, setClientsError] = useState('');
 
   const [settings, setSettings] = useState(() => {
     const saved = localStorage.getItem('printpro_settings');
@@ -71,6 +75,30 @@ export function AppProvider({ children }) {
     window.addEventListener('auth:expired', expired);
     return () => { active = false; window.removeEventListener('auth:expired', expired); };
   }, []);
+
+  useEffect(() => {
+    if (!currentUser || !['ADMINISTRADOR', 'RESPONSAVEL_GRAFICA'].includes(currentUser.role)) return undefined;
+    let active = true;
+    setClientsLoading(true);
+    setClientsError('');
+    clientApi.list()
+      .then((items) => { if (active) setClients(items); })
+      .catch((error) => { if (active) setClientsError(error.message); })
+      .finally(() => { if (active) setClientsLoading(false); });
+    return () => { active = false; };
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (currentUser?.role !== 'ADMINISTRADOR') return undefined;
+    let active = true;
+    setUsersLoading(true);
+    setUsersError('');
+    userApi.list()
+      .then((items) => { if (active) setUsers(items); })
+      .catch((error) => { if (active) setUsersError(error.message); })
+      .finally(() => { if (active) setUsersLoading(false); });
+    return () => { active = false; };
+  }, [currentUser]);
 
   // Persist changes
   useEffect(() => {
@@ -456,16 +484,17 @@ export function AppProvider({ children }) {
 
   // ==================== ADMIN USERS ACTIONS ====================
 
-  const addUser = (userData) => {
-    const newUser = {
+  const addUser = (userData) => userApi.create(userData).then((newUser) => {
+    /* const newUser = {
       ...userData,
       id: Date.now(),
       status: 'ATIVO',
       createdAt: new Date().toISOString().split('T')[0]
     };
-    setUsers(prev => [newUser, ...prev]);
+    setUsers(prev => [newUser, ...prev]); */
     addToast(`Usuário ${userData.name} cadastrado com sucesso!`, 'success');
-  };
+    return newUser;
+  });
 
   const updateUser = (userId, patch) => {
     setUsers(prev => prev.map(u => (u.id === userId ? { ...u, ...patch } : u)));
@@ -481,6 +510,28 @@ export function AppProvider({ children }) {
       }
       return u;
     }));
+  };
+
+  const createUserFromApi = (userData) => userApi.create(userData).then((newUser) => {
+    setUsers(prev => [newUser, ...prev]);
+    addToast(`Usuário ${userData.name} cadastrado com sucesso!`, 'success');
+    return newUser;
+  });
+
+  const editUserFromApi = (userId, patch) => userApi.update(userId, patch).then((updatedUser) => {
+    setUsers(prev => prev.map(u => (u.id === userId ? updatedUser : u)));
+    addToast('Usuário atualizado com sucesso!', 'success');
+    return updatedUser;
+  });
+
+  const setUserActiveFromApi = (userId) => {
+    const user = users.find(item => item.id === userId);
+    if (!user) return Promise.resolve();
+    return userApi.update(userId, { is_active: user.status !== 'ATIVO' }).then((updatedUser) => {
+      setUsers(prev => prev.map(u => (u.id === userId ? updatedUser : u)));
+      addToast(`Usuário ${updatedUser.status === 'ATIVO' ? 'ativado' : 'desativado'}!`, 'info');
+      return updatedUser;
+    });
   };
 
   // ==================== ADMIN CLIENTS ACTIONS ====================
@@ -543,7 +594,11 @@ export function AppProvider({ children }) {
         services,
         orders,
         users,
+        usersLoading,
+        usersError,
         clients,
+        clientsLoading,
+        clientsError,
         settings,
         cart,
         toasts,
@@ -563,6 +618,9 @@ export function AppProvider({ children }) {
         addUser,
         updateUser,
         toggleUserStatus,
+        createUserFromApi,
+        editUserFromApi,
+        setUserActiveFromApi,
         addClient,
         updateClient,
         updateSettings,
