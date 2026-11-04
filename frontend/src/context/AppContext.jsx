@@ -6,6 +6,11 @@ import {
   INITIAL_CLIENTS,
   INITIAL_SETTINGS
 } from '../data/mockData';
+import {
+  ROLE_HOME_VIEW,
+  authenticateUser,
+  buildRegistrationRecords
+} from '../utils/authLogic';
 
 const AppContext = createContext();
 
@@ -113,89 +118,34 @@ export function AppProvider({ children }) {
 
   // ==================== AUTH ACTIONS (MOCK) ====================
 
-  const ROLE_HOME_VIEW = {
-    CLIENTE: 'home',
-    RESPONSAVEL_GRAFICA: 'resp-dashboard',
-    ADMINISTRADOR: 'admin-dashboard'
-  };
-
-  const startSession = (user) => {
-    const session = { id: user.id, name: user.name, email: user.email, role: user.role };
+  const startSession = (session) => {
     setCurrentUser(session);
     localStorage.setItem('printpro_session', JSON.stringify(session));
-    setCurrentRole(user.role);
-    navigateTo(ROLE_HOME_VIEW[user.role] || 'home');
+    setCurrentRole(session.role);
+    navigateTo(ROLE_HOME_VIEW[session.role] || 'home');
   };
 
   // TODO: substituir pela chamada ao endpoint de autenticação quando estiver disponível no backend.
-  // Enquanto isso, valida apenas se o e-mail pertence a um usuário cadastrado e ativo.
   const login = (email, password) => {
-    const normalizedEmail = email.trim().toLowerCase();
-    if (!normalizedEmail || !password) {
-      return { ok: false, error: 'Informe seu e-mail e sua senha.' };
+    const result = authenticateUser({ email, password, users });
+    if (!result.ok) {
+      return { ok: false, error: result.error };
     }
-
-    const user = users.find(u => u.email.toLowerCase() === normalizedEmail);
-    if (!user) {
-      return { ok: false, error: 'Não encontramos uma conta com este e-mail.' };
-    }
-    if (user.status !== 'ATIVO') {
-      return { ok: false, error: 'Esta conta está desativada. Entre em contato com a gráfica.' };
-    }
-
-    startSession(user);
-    addToast(`Bem-vindo(a), ${user.name.split(' ')[0]}!`, 'success');
+    startSession(result.session);
+    addToast(`Bem-vindo(a), ${result.user.name.split(' ')[0]}!`, 'success');
     return { ok: true };
   };
 
   // Self-service sign-up: creates the CLIENTE user and its client record.
   // TODO: integrar com POST /users (e cadastro de cliente) quando o frontend consumir a API.
-  const register = ({ personType, document, name, company, email, birthDate, phone, address }) => {
-    const normalizedEmail = email.trim().toLowerCase();
-    if (users.some(u => u.email.toLowerCase() === normalizedEmail)) {
-      return { ok: false, error: 'Já existe um usuário com este e-mail.' };
+  const register = (payload) => {
+    const result = buildRegistrationRecords(payload, { users, clients });
+    if (!result.ok) {
+      return { ok: false, error: result.error };
     }
-
-    const documentDigits = (document || '').replace(/\D/g, '');
-    if (documentDigits && clients.some(c => (c.document || '').replace(/\D/g, '') === documentDigits)) {
-      return { ok: false, error: 'Já existe um cliente cadastrado com este documento.' };
-    }
-
-    const id = Date.now();
-    const today = new Date().toISOString().split('T')[0];
-
-    const newUser = {
-      id,
-      name: name.trim(),
-      email: normalizedEmail,
-      role: 'CLIENTE',
-      status: 'ATIVO',
-      phone: phone || '',
-      createdAt: today
-    };
-
-    const street = [address?.street?.trim(), address?.number?.trim()].filter(Boolean).join(', ');
-    const newClient = {
-      id,
-      name: name.trim(),
-      company: company?.trim() || '',
-      document: document || '',
-      documentType: personType === 'PJ' ? 'CNPJ' : 'CPF',
-      email: normalizedEmail,
-      phone: phone || '',
-      birthDate: birthDate || '',
-      cep: address?.cep || '',
-      city: address?.city?.trim() || '',
-      state: address?.state || '',
-      address: [street, address?.complement?.trim(), address?.district?.trim()].filter(Boolean).join(' - '),
-      totalOrders: 0,
-      totalSpent: 0,
-      status: 'ATIVO'
-    };
-
-    setUsers(prev => [newUser, ...prev]);
-    setClients(prev => [newClient, ...prev]);
-    startSession(newUser);
+    setUsers(prev => [result.newUser, ...prev]);
+    setClients(prev => [result.newClient, ...prev]);
+    startSession(result.session);
     addToast('Conta criada com sucesso! Bem-vindo(a) à PrintPro.', 'success');
     return { ok: true };
   };
@@ -216,6 +166,7 @@ export function AppProvider({ children }) {
     const newId = `PRP-${1047 + orders.length}`;
     const newOrder = {
       id: newId,
+      clientId: orderData.clientId ?? currentUser?.id ?? null,
       createdAt: new Date().toISOString(),
       status: 'EM_ANALISE',
       timeline: [

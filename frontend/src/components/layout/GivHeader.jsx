@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Search, ShoppingCart, MessageCircle, User, Bell, Package, ChevronRight, LogOut } from 'lucide-react';
+import { getOrdersForUser } from '../../utils/authLogic';
 
 export function GivHeader() {
   const {
@@ -32,8 +33,10 @@ export function GivHeader() {
     navigateTo('novo-pedido', { serviceId });
   };
 
-  // Pending corrections badge count for Client
-  const pendingCorrectionsCount = orders.filter(o => o.status === 'AGUARDANDO_CORRECAO').length;
+  // Pending corrections badge count scoped to the authenticated Client
+  const pendingCorrectionsCount = getOrdersForUser(orders, currentUser).filter(
+    o => o.status === 'AGUARDANDO_CORRECAO'
+  ).length;
 
   return (
     <header className="w-full bg-white border-b border-gray-200 sticky top-0 z-40 shadow-xs">

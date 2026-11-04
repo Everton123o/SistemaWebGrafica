@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 
 export function NovoPedido() {
-  const { services, selectedServiceId, navigateTo, createOrder, addToast } = useApp();
+  const { services, selectedServiceId, navigateTo, createOrder, addToast, currentUser, clients } = useApp();
 
   const service = services.find(s => s.id === selectedServiceId) || services[0];
 
@@ -23,11 +23,15 @@ export function NovoPedido() {
   const [clientObservations, setClientObservations] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Client info (prefilled for convenience)
-  const [clientName, setClientName] = useState('Carlos Eduardo Santos');
-  const [clientCompany, setClientCompany] = useState('Hamburgueria Delmiro Gourmet');
-  const [clientEmail, setClientEmail] = useState('carlos@hamburgueriadelmiro.com.br');
-  const [clientPhone, setClientPhone] = useState('(82) 98845-1290');
+  // Resolve authenticated client profile (or fallback to default demo client)
+  const matchedClient = currentUser
+    ? clients.find(c => c.email.toLowerCase() === currentUser.email.toLowerCase())
+    : null;
+
+  const clientName = currentUser?.name || 'Carlos Eduardo Santos';
+  const clientCompany = matchedClient?.company || (currentUser ? 'Pessoa Física' : 'Hamburgueria Delmiro Gourmet');
+  const clientEmail = currentUser?.email || 'carlos@hamburgueriadelmiro.com.br';
+  const clientPhone = matchedClient?.phone || currentUser?.phone || '(82) 98845-1290';
 
   // Initialize specs from service requirements
   useEffect(() => {
@@ -89,6 +93,7 @@ export function NovoPedido() {
 
     setTimeout(() => {
       createOrder({
+        clientId: currentUser?.id ?? matchedClient?.id ?? null,
         clientName,
         clientCompany,
         clientEmail,

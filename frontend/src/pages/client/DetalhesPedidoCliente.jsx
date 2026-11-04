@@ -3,6 +3,7 @@ import { useApp } from '../../context/AppContext';
 import { OrderStatusBadge, ArtStatusBadge } from '../../components/common/Badge';
 import { OrderTimeline } from '../../components/shared/OrderTimeline';
 import { FileUploadZone } from '../../components/shared/FileUploadZone';
+import { getOrdersForUser } from '../../utils/authLogic';
 import {
   ArrowLeft,
   AlertTriangle,
@@ -18,9 +19,10 @@ import {
 } from 'lucide-react';
 
 export function DetalhesPedidoCliente() {
-  const { orders, selectedOrderId, navigateTo, submitClientCorrection, addToast } = useApp();
+  const { orders, selectedOrderId, navigateTo, submitClientCorrection, addToast, currentUser } = useApp();
 
-  const order = orders.find(o => o.id === selectedOrderId) || orders[0];
+  const clientOrders = getOrdersForUser(orders, currentUser);
+  const order = clientOrders.find(o => o.id === selectedOrderId) || clientOrders[0];
 
   // Correction submission state
   const [newCorrectionFile, setNewCorrectionFile] = useState(null);

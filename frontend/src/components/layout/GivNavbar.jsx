@@ -52,16 +52,16 @@ export function GivNavbar() {
                       : 'text-gray-300 hover:text-white hover:bg-white/5'
                   }`}
                 >
-                {/*  Início*/}
-                {/*</button>*/}
-                {/*<button*/}
-                {/*  onClick={() => navigateTo('catalogo')}*/}
-                {/*  className={`px-3 py-2 rounded-lg transition whitespace-nowrap ${*/}
-                {/*    currentView === 'catalogo'*/}
-                {/*      ? 'text-brand-yellow font-bold bg-white/10'*/}
-                {/*      : 'text-gray-300 hover:text-white hover:bg-white/5'*/}
-                {/*  }`}*/}
-                {/*>*/}
+                  Início
+                </button>
+                <button
+                  onClick={() => navigateTo('catalogo')}
+                  className={`px-3 py-2 rounded-lg transition whitespace-nowrap ${
+                    currentView === 'catalogo'
+                      ? 'text-brand-yellow font-bold bg-white/10'
+                      : 'text-gray-300 hover:text-white hover:bg-white/5'
+                  }`}
+                >
                   Catálogo Completo
                 </button>
                 <button
@@ -148,6 +148,17 @@ export function GivNavbar() {
                 >
                   <Layers className="w-3.5 h-3.5 text-emerald-400" />
                   <span>Acompanhar Produção</span>
+                </button>
+                <button
+                  onClick={() => navigateTo('admin-clientes')}
+                  className={`px-3 py-2 rounded-lg transition whitespace-nowrap flex items-center gap-1.5 ${
+                    currentView === 'admin-clientes'
+                      ? 'bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40'
+                      : 'text-gray-300 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <Users className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Clientes</span>
                 </button>
               </div>
             )}

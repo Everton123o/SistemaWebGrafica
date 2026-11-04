@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { OrderStatusBadge } from '../../components/common/Badge';
+import { getOrdersForUser } from '../../utils/authLogic';
 import { Package, Clock, AlertTriangle, ArrowRight, CheckCircle2, Search, Filter } from 'lucide-react';
 
 export function MeusPedidos() {
-  const { orders, navigateTo } = useApp();
+  const { orders, navigateTo, currentUser } = useApp();
   const [filterStatus, setFilterStatus] = useState('TODOS');
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -17,15 +18,18 @@ export function MeusPedidos() {
     { id: 'FINALIZADO', label: 'Finalizados / Entregues' }
   ];
 
-  const filteredOrders = orders.filter(order => {
+  // Restricts orders to the authenticated CLIENTE (.harness/rules-frontend.md §3)
+  const clientOrders = getOrdersForUser(orders, currentUser);
+
+  const filteredOrders = clientOrders.filter(order => {
     const matchesStatus = filterStatus === 'TODOS' || order.status === filterStatus;
     const matchesSearch = order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           order.serviceName.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesStatus && matchesSearch;
   });
 
-  // Count pending corrections
-  const correctionCount = orders.filter(o => o.status === 'AGUARDANDO_CORRECAO').length;
+  // Count pending corrections only for the current client's orders
+  const correctionCount = clientOrders.filter(o => o.status === 'AGUARDANDO_CORRECAO').length;
 
   return (
     <div className="space-y-6">
