@@ -3,13 +3,13 @@
 Com dois túneis, crie `frontend/.env` antes de iniciar o Vite:
 
 ```env
-VITE_API_URL=https://SEU-TUNEL-DA-API.ngrok-free.app
+VITE_API_URL=https://1833-2804-29b8-541a-91dd-38b4-ec21-c597-7ca1.ngrok-free.app 
 ```
 
 No `backend/.env`, use a origem pública do frontend:
 
 ```env
-CORS_ORIGINS=["https://SEU-TUNEL-DO-FRONTEND.ngrok-free.app"]
+CORS_ORIGINS=["https://a488-2804-29b8-541a-91dd-38b4-ec21-c597-7ca1.ngrok-free.app "]
 ```
 
 Reinicie o Vite e a API depois de alterar esses arquivos. Nunca configure

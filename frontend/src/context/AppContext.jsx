@@ -1,4 +1,4 @@
-import { authApi, clientApi, userApi, clearToken, saveToken, getToken, mapUser } from '../services/auth.js';
+import { authApi, clientApi, userApi, serviceApi, clearToken, saveToken, getToken, mapUser } from '../services/auth.js';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   INITIAL_SERVICES,
@@ -30,6 +30,8 @@ export function AppProvider({ children }) {
     const saved = localStorage.getItem('printpro_services');
     return saved ? JSON.parse(saved) : INITIAL_SERVICES;
   });
+  const [servicesLoading, setServicesLoading] = useState(false);
+  const [servicesError, setServicesError] = useState('');
 
   const [orders, setOrders] = useState(() => {
     const saved = localStorage.getItem('printpro_orders');
@@ -88,6 +90,7 @@ export function AppProvider({ children }) {
     return () => { active = false; };
   }, [currentUser]);
 
+
   useEffect(() => {
     if (currentUser?.role !== 'ADMINISTRADOR') return undefined;
     let active = true;
@@ -99,6 +102,24 @@ export function AppProvider({ children }) {
       .finally(() => { if (active) setUsersLoading(false); });
     return () => { active = false; };
   }, [currentUser]);
+
+
+  useEffect(() => {
+    let active = true;
+    setServicesLoading(true);
+    setServicesError('');
+    serviceApi.list()
+      .then((items) => {
+        if (active && items.length > 0) setServices(items);
+      })
+      .catch((error) => {
+        if (active) setServicesError(error.message);
+      })
+      .finally(() => {
+        if (active) setServicesLoading(false);
+      });
+    return () => { active = false; };
+  }, []);
 
   // Persist changes
   useEffect(() => {
@@ -448,38 +469,43 @@ export function AppProvider({ children }) {
   // ==================== ADMIN SERVICES ACTIONS ====================
 
   const addService = (newService) => {
-    const id = Date.now();
-    const serviceWithId = {
-      ...newService,
-      id,
-      slug: newService.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-      rating: 5.0,
-      reviewCount: 0,
-      badge: 'Novo'
-    };
-    setServices(prev => [serviceWithId, ...prev]);
-    addToast(`Serviço "${newService.name}" adicionado com sucesso!`, 'success');
+    return serviceApi.create(newService)
+      .then((created) => {
+        setServices(prev => [created, ...prev]);
+        addToast(`Serviço "${newService.name}" adicionado com sucesso!`, 'success');
+        return created;
+      })
+      .catch((error) => {
+        addToast(`Erro ao salvar no banco: ${error.message}`, 'error');
+        throw error;
+      });
   };
 
   const updateService = (serviceId, patch) => {
-    setServices(prev => prev.map(s => (s.id === serviceId ? { ...s, ...patch } : s)));
-    addToast('Serviço atualizado com sucesso!', 'success');
+    const current = services.find(s => s.id === serviceId);
+    if (!current) return Promise.reject(new Error('Serviço não encontrado.'));
+    const payload = { ...current, ...patch };
+    return serviceApi.update(serviceId, payload)
+      .then((updated) => {
+        setServices(prev => prev.map(s => (s.id === serviceId ? updated : s)));
+        addToast('Serviço atualizado com sucesso!', 'success');
+        return updated;
+      })
+      .catch((error) => {
+        addToast(`Erro ao atualizar no banco: ${error.message}`, 'error');
+        throw error;
+      });
   };
 
   const toggleServiceStatus = (serviceId) => {
-    setServices(prev => prev.map(s => {
-      if (s.id === serviceId) {
-        const nextActive = s.inactive ? false : true;
-        addToast(`Serviço ${s.name} ${nextActive ? 'desativado' : 'ativado'}!`, 'info');
-        return { ...s, inactive: nextActive };
-      }
-      return s;
-    }));
+    const current = services.find(s => s.id === serviceId);
+    if (!current) return Promise.resolve();
+    const nextInactive = !current.inactive;
+    return updateService(serviceId, { inactive: nextInactive });
   };
 
   const updateServiceRequirements = (serviceId, requirements) => {
-    setServices(prev => prev.map(s => (s.id === serviceId ? { ...s, requirements } : s)));
-    addToast('Requisitos do serviço atualizados com sucesso!', 'success');
+    return updateService(serviceId, { requirements });
   };
 
   // ==================== ADMIN USERS ACTIONS ====================
@@ -592,6 +618,8 @@ export function AppProvider({ children }) {
         searchQuery,
         setSearchQuery,
         services,
+        servicesLoading,
+        servicesError,
         orders,
         users,
         usersLoading,

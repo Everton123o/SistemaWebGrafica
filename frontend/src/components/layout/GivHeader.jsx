@@ -19,11 +19,11 @@ export function GivHeader() {
 
   // Filter services for quick search
   const filteredServices = localSearch.trim()
-    ? services.filter(s =>
-        s.name.toLowerCase().includes(localSearch.toLowerCase()) ||
-        s.category.toLowerCase().includes(localSearch.toLowerCase()) ||
-        s.description.toLowerCase().includes(localSearch.toLowerCase())
-      ).slice(0, 5)
+    ? services.filter(s => !s.inactive && (
+      s.name.toLowerCase().includes(localSearch.toLowerCase()) ||
+      s.category.toLowerCase().includes(localSearch.toLowerCase()) ||
+      s.description.toLowerCase().includes(localSearch.toLowerCase())
+    )).slice(0, 5)
     : [];
 
   const handleSelectSearchedService = (serviceId) => {
@@ -39,7 +39,7 @@ export function GivHeader() {
     <header className="w-full bg-white border-b border-gray-200 sticky top-0 z-40 shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5">
         <div className="flex items-center justify-between gap-4">
-          
+
           {/* Brand Logo: PrintPro Gráfica */}
           <div className="flex items-center gap-3">
             <button
@@ -150,10 +150,10 @@ export function GivHeader() {
 
           {/* Right Action Buttons */}
           <div className="flex items-center gap-2 sm:gap-4">
-            
+
             {/* WhatsApp Contact */}
             <a
-              href="https://wa.me/5582999330488?text=Ol%C3%A1%2C%20gostaria%20de%20um%20or%C3%A7amento%20na%20PrintPro%20Gr%C3%A1fica!%20sou%20marcolinha%20do%20x%20%2B18"
+              href="https://wa.me/5582998244632?text=Ol%C3%A1%2C%20gostaria%20de%20um%20or%C3%A7amento%20na%20PrintPro%20Gr%C3%A1fica!"
               target="_blank"
               rel="noopener noreferrer"
               className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 font-semibold text-xs transition"
@@ -164,7 +164,7 @@ export function GivHeader() {
               </div>
               <div className="text-left leading-tight">
                 <span className="block text-[10px] text-emerald-600 font-normal">WhatsApp DG</span>
-                <span className="font-bold text-xs">(82) 9 9933-0488</span>
+                <span className="font-bold text-xs">(82) 9 998244632</span>
               </div>
             </a>
 

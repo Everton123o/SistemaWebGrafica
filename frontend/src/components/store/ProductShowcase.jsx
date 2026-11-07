@@ -5,6 +5,7 @@ import { Flame, Sparkles, Trophy, Heart } from 'lucide-react';
 
 export function ProductShowcase() {
   const { services } = useApp();
+  const activeServices = services.filter(service => !service.inactive);
   const [activeTab, setActiveTab] = useState('mais-vendidos');
 
   const tabs = [
@@ -16,15 +17,15 @@ export function ProductShowcase() {
 
   const getFilteredServices = () => {
     if (activeTab === 'mais-vendidos') {
-      return services.filter(s => s.popular);
+      return activeServices.filter(s => s.popular);
     } else if (activeTab === 'destaques-insta') {
-      return services.filter(s => s.category === 'Brindes & Copos' || s.category === 'Adesivos & Rótulos');
+      return activeServices.filter(s => s.category === 'Brindes & Copos' || s.category === 'Adesivos & Rótulos');
     } else if (activeTab === 'comunicacao-visual') {
-      return services.filter(s => s.category === 'Comunicação Visual');
+      return activeServices.filter(s => s.category === 'Comunicação Visual');
     } else if (activeTab === 'adesivos') {
-      return services.filter(s => s.category === 'Adesivos & Rótulos');
+      return activeServices.filter(s => s.category === 'Adesivos & Rótulos');
     }
-    return services;
+    return activeServices;
   };
 
   const displayedServices = getFilteredServices();

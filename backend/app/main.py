@@ -5,6 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import get_settings
 
 from app.api import api_router
+from app.core.database import Base, engine
+from app.models.service import Service
 
 
 def create_app() -> FastAPI:
@@ -15,10 +17,14 @@ def create_app() -> FastAPI:
         CORSMiddleware,
         allow_origins=settings.cors_origins,
         allow_credentials=False,
-        allow_methods=["GET", "POST", "OPTIONS"],
+        allow_methods=["GET", "POST", "PATCH", "OPTIONS"],
         allow_headers=["Authorization", "Content-Type", "ngrok-skip-browser-warning"],
     )
     application.include_router(api_router)
+    if engine is not None:
+        @application.on_event("startup")
+        def create_service_table():
+            Base.metadata.create_all(bind=engine, tables=[Service.__table__])
     return application
 
 

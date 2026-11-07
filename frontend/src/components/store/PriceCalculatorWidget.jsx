@@ -4,6 +4,7 @@ import { Calculator, ArrowRight, Clock, ShieldCheck, Sparkles, CheckCircle2 } fr
 
 export function PriceCalculatorWidget() {
   const { navigateTo, services } = useApp();
+  const activeServices = services.filter(service => !service.inactive);
 
   const [selectedProductId, setSelectedProductId] = useState(1); // Cartão por padrão
   const [selectedQuantity, setSelectedQuantity] = useState(500);
@@ -95,7 +96,7 @@ export function PriceCalculatorWidget() {
               onChange={(e) => setSelectedProductId(Number(e.target.value))}
               className="w-full px-3.5 py-2.5 rounded-xl bg-gray-800 border border-gray-700 text-white text-xs font-semibold focus:outline-none focus:border-brand-cyan transition"
             >
-              {services.map(s => (
+              {activeServices.map(s => (
                 <option key={s.id} value={s.id}>
                   {s.name}
                 </option>

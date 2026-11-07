@@ -4,14 +4,15 @@ import { ProductCard } from '../../components/store/ProductCard';
 import { Filter, Search, Tag, ArrowUpDown, Sparkles } from 'lucide-react';
 
 export function Catalogo() {
-  const { services, navigateTo } = useApp();
+  const { services } = useApp();
+  const activeServices = services.filter(service => !service.inactive);
   const [selectedCategory, setSelectedCategory] = useState('TODOS');
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState('destaque');
 
-  const categories = ['TODOS', ...Array.from(new Set(services.map(s => s.category)))];
+  const categories = ['TODOS', ...Array.from(new Set(activeServices.map(s => s.category)))];
 
-  const filtered = services.filter(service => {
+  const filtered = activeServices.filter(service => {
     const matchesCategory = selectedCategory === 'TODOS' || service.category === selectedCategory;
     const matchesSearch = service.name.toLowerCase().includes(search.toLowerCase()) ||
                           service.description.toLowerCase().includes(search.toLowerCase());

@@ -103,3 +103,10 @@ export const userApi = {
   create: async (user) => mapAdminUser(await apiRequest('/users', { method: 'POST', body: user })),
   update: async (id, user) => mapAdminUser(await apiRequest(`/users/${id}`, { method: 'PATCH', body: user }))
 };
+
+const mapService = (item) => ({ ...item, priceFrom: item.priceFrom ?? item.price_from, deliveryDays: item.deliveryDays ?? item.delivery_days, reviewCount: item.reviewCount ?? item.review_count, createdAt: item.createdAt ?? item.created_at, updatedAt: item.updatedAt ?? item.updated_at });
+export const serviceApi = {
+  list: async () => (await apiRequest('/services', { authenticated: false })).map(mapService),
+  create: async (service) => mapService(await apiRequest('/services', { method: 'POST', body: service, authenticated: true })),
+  update: async (id, service) => mapService(await apiRequest(`/services/${id}`, { method: 'PATCH', body: service, authenticated: true }))
+};

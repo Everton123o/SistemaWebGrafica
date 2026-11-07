@@ -23,7 +23,8 @@ export function GivNavbar() {
   const [megaMenuOpen, setMegaMenuOpen] = useState(false);
 
   // Group services by category for mega menu
-  const categories = Array.from(new Set(services.map(s => s.category)));
+  const activeServices = services.filter(service => !service.inactive);
+  const categories = Array.from(new Set(activeServices.map(s => s.category)));
 
   return (
     <nav className="w-full bg-[#263C75] text-white border-b border-gray-800 text-xs font-medium relative z-30">
@@ -245,7 +246,7 @@ export function GivNavbar() {
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {categories.map((category) => {
-                  const catServices = services.filter(s => s.category === category);
+                  const catServices = activeServices.filter(s => s.category === category);
                   return (
                     <div key={category} className="space-y-2">
                       <h4 className="text-xs font-bold uppercase tracking-wider text-brand-navy border-b border-gray-100 pb-1">
