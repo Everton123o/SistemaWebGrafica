@@ -1,5 +1,6 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
+import { PullToRefresh } from '../../components/common/PullToRefresh';
 import {
   Shield,
   DollarSign,
@@ -50,20 +51,23 @@ export function DashboardAdmin() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
-        {/* Faturamento Estimado */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-2xs">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Faturamento Total</span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs">
-              <DollarSign className="w-4 h-4" />
+        {/* Faturamento Total com o card elástico e interativo PullToRefresh / Bencho */}
+        <div className="sm:col-span-2 lg:col-span-2">
+          <div className="rounded-2xl border border-gray-200/90 bg-white p-2 shadow-2xs">
+            <div className="px-3 pt-3 pb-1 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Faturamento Total</span>
+                <p className="text-[11px] text-gray-400">Puxe para baixo para atualizar · Arraste na linha para ver os valores</p>
+              </div>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-emerald-50 text-emerald-700 font-bold text-xs">
+                <TrendingUp className="w-3.5 h-3.5" />
+                <span>Margem {settings.markupPercentage}%</span>
+              </div>
             </div>
+            <PullToRefresh orders={orders} />
           </div>
-          <div className="text-2xl font-black text-gray-900 mt-2">
-            R$ {totalBilling.toFixed(2).replace('.', ',')}
-          </div>
-          <p className="text-[11px] text-emerald-600 font-semibold mt-1">Margem média: {settings.markupPercentage}%</p>
         </div>
 
         {/* Pedidos em Andamento */}

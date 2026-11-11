@@ -1,4 +1,4 @@
-import { authApi, clientApi, userApi, serviceApi, clearToken, saveToken, getToken, mapUser } from '../services/auth.js';
+import { authApi, clientApi, userApi, serviceApi, orderApi, clearToken, saveToken, getToken, mapUser } from '../services/auth.js';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   INITIAL_SERVICES,
@@ -121,6 +121,17 @@ export function AppProvider({ children }) {
     return () => { active = false; };
   }, []);
 
+  useEffect(() => {
+    if (!currentUser) return undefined;
+    let active = true;
+    orderApi.list()
+      .then((items) => {
+        if (active && items.length > 0) setOrders(items);
+      })
+      .catch(() => {});
+    return () => { active = false; };
+  }, [currentUser]);
+
   // Persist changes
   useEffect(() => {
     localStorage.setItem('printpro_services', JSON.stringify(services));
@@ -238,6 +249,14 @@ export function AppProvider({ children }) {
 
     setOrders(prev => [newOrder, ...prev]);
     setSelectedOrderId(newId);
+    
+    // Tenta persistir na API em segundo plano
+    orderApi.create(newOrder)
+      .then((saved) => {
+        setOrders(prev => prev.map(o => o.id === newId ? saved : o));
+      })
+      .catch(() => {});
+
     addToast(`Pedido #${newId} criado com sucesso! Arte enviada para pré-impressão.`, 'success');
     navigateTo('detalhes-pedido-cliente', { orderId: newId });
     return newId;

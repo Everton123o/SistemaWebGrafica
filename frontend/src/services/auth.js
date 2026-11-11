@@ -110,3 +110,26 @@ export const serviceApi = {
   create: async (service) => mapService(await apiRequest('/services', { method: 'POST', body: service, authenticated: true })),
   update: async (id, service) => mapService(await apiRequest(`/services/${id}`, { method: 'PATCH', body: service, authenticated: true }))
 };
+
+const mapOrder = (item) => ({
+  ...item,
+  id: item.code || item.id,
+  dbId: item.id,
+  clientName: item.clientName ?? item.client_name,
+  clientEmail: item.clientEmail ?? item.client_email,
+  clientPhone: item.clientPhone ?? item.client_phone,
+  clientCompany: item.clientCompany ?? item.client_company,
+  serviceId: item.serviceId ?? item.service_id,
+  serviceName: item.serviceName ?? item.service_name,
+  totalValue: item.totalValue ?? item.total_value,
+  artVersions: item.artVersions ?? item.art_versions ?? [],
+  productionStage: item.productionStage ?? item.production_stage,
+  createdAt: item.createdAt ?? item.created_at,
+  updatedAt: item.updatedAt ?? item.updated_at
+});
+
+export const orderApi = {
+  list: async () => (await apiRequest('/orders', { authenticated: true })).map(mapOrder),
+  create: async (order) => mapOrder(await apiRequest('/orders', { method: 'POST', body: order, authenticated: true })),
+  update: async (id, patch) => mapOrder(await apiRequest(`/orders/${id}`, { method: 'PATCH', body: patch, authenticated: true }))
+};

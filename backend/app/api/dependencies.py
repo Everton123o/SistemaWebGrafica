@@ -32,6 +32,7 @@ def current_user(credentials: HTTPAuthorizationCredentials | None = Depends(bear
 
 
 CurrentUser = Depends(current_user)
+get_current_user = current_user
 
 
 def require_admin(user=CurrentUser):
