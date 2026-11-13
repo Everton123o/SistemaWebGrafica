@@ -1,14 +1,26 @@
 // Set VITE_API_URL to the public API tunnel when frontend and API use separate
 // ngrok URLs. The /api default keeps the local Vite proxy working.
 const API_URL = (import.meta.env?.VITE_API_URL || '/api').replace(/\/$/, '');
-const TOKEN_KEY = 'printpro_token';
+const CSRF_KEY = 'printpro_csrf_token';
 let expiryTimer;
 
-export const getToken = () => sessionStorage.getItem(TOKEN_KEY);
+export const getToken = () => {
+  const cached = sessionStorage.getItem(CSRF_KEY);
+  if (cached) return cached;
+  if (typeof document !== 'undefined') {
+    const match = document.cookie.match(/(?:^|; )printpro_csrf=([^;]+)/);
+    return match ? decodeURIComponent(match[1]) : null;
+  }
+  return null;
+};
 export function clearToken() {
   clearTimeout(expiryTimer);
-  sessionStorage.removeItem(TOKEN_KEY);
+  sessionStorage.removeItem(CSRF_KEY);
   sessionStorage.removeItem('printpro_token_expiry');
+  if (typeof localStorage !== 'undefined') {
+    Object.keys(localStorage).filter((key) => key.startsWith('printpro_'))
+      .forEach((key) => localStorage.removeItem(key));
+  }
 }
 
 function expire() {
@@ -18,7 +30,7 @@ function expire() {
 
 export function saveToken(token, expiresIn) {
   clearTimeout(expiryTimer);
-  sessionStorage.setItem(TOKEN_KEY, token);
+  if (token) sessionStorage.setItem(CSRF_KEY, token);
   sessionStorage.setItem('printpro_token_expiry', String(Date.now() + expiresIn * 1000));
   expiryTimer = setTimeout(expire, expiresIn * 1000);
 }
@@ -62,11 +74,14 @@ export function mapAdminUser(user) {
 export async function apiRequest(path, { method = 'GET', body, authenticated = true } = {}) {
   const headers = { 'Content-Type': 'application/json' };
   if (API_URL.includes('ngrok')) headers['ngrok-skip-browser-warning'] = 'true';
-  if (authenticated && getToken()) headers.Authorization = `Bearer ${getToken()}`;
+  if (authenticated && !['GET', 'HEAD', 'OPTIONS'].includes(method.toUpperCase()) && getToken()) {
+    headers['X-CSRF-Token'] = getToken();
+  }
   let response;
   try {
     response = await fetch(`${API_URL}${path}`, {
       method, headers, body: body === undefined ? undefined : JSON.stringify(body),
+      credentials: 'include',
       signal: AbortSignal.timeout(15000)
     });
   } catch { throw new Error('Não foi possível conectar à API. Tente novamente.'); }
@@ -84,9 +99,15 @@ export async function apiRequest(path, { method = 'GET', body, authenticated = t
 export const authApi = {
   login: body => apiRequest('/auth/login', { method: 'POST', body, authenticated: false }),
   register: body => apiRequest('/auth/register', { method: 'POST', body, authenticated: false }),
+  logout: () => apiRequest('/auth/logout', { method: 'POST' }),
   me: async () => {
     const user = await apiRequest('/auth/me');
-    const remaining = Number(sessionStorage.getItem('printpro_token_expiry')) - Date.now();
+    let expiry = Number(sessionStorage.getItem('printpro_token_expiry'));
+    if (!Number.isFinite(expiry)) {
+      expiry = Date.now() + 15 * 60 * 1000;
+      sessionStorage.setItem('printpro_token_expiry', String(expiry));
+    }
+    const remaining = expiry - Date.now();
     if (remaining <= 0) { expire(); throw new Error('Sessão expirada.'); }
     clearTimeout(expiryTimer);
     expiryTimer = setTimeout(expire, remaining);
@@ -130,6 +151,8 @@ const mapOrder = (item) => ({
 
 export const orderApi = {
   list: async () => (await apiRequest('/orders', { authenticated: true })).map(mapOrder),
-  create: async (order) => mapOrder(await apiRequest('/orders', { method: 'POST', body: order, authenticated: true })),
+  create: async (order) => mapOrder(await apiRequest('/orders', { method: 'POST', body: {
+    service_id: order.serviceId, specs: order.specs || {}, observations: order.observations || ''
+  }, authenticated: true })),
   update: async (id, patch) => mapOrder(await apiRequest(`/orders/${id}`, { method: 'PATCH', body: patch, authenticated: true }))
 };

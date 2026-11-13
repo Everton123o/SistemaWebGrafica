@@ -1,6 +1,7 @@
 """Client persistence model."""
 
 from datetime import datetime
+from typing import Optional
 
 from sqlalchemy import DateTime, ForeignKey, String, JSON, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -12,15 +13,15 @@ class Client(Base):
     __tablename__ = "clients"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(
+    user_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("users.id"), nullable=True, unique=True
     )
     name: Mapped[str] = mapped_column(String(150), nullable=False)
-    cpf_cnpj: Mapped[str] = mapped_column(String(18), nullable=False)
+    cpf_cnpj: Mapped[str] = mapped_column(String(18), nullable=False, unique=True)
     phone: Mapped[str] = mapped_column(String(30), nullable=False)
     email: Mapped[str] = mapped_column(String(255), nullable=False)
     address: Mapped[str] = mapped_column(String(255), nullable=False)
-    registration_details: Mapped[dict] = mapped_column(JSON, nullable=True)
+    registration_details: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), onupdate=func.now(), nullable=False

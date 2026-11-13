@@ -15,5 +15,7 @@ class ClientService:
         return self.repository.list()
 
     def create(self, data: ClientCreate) -> Client:
+        if self.repository.get_by_document(data.cpf_cnpj):
+            raise ValueError("CPF/CNPJ já cadastrado.")
         client = Client(**data.model_dump())
         return self.repository.create(client)

@@ -11,8 +11,9 @@ class Settings(BaseSettings):
     database_url: str | None = None
     jwt_secret: str | None = None
     jwt_algorithm: str = "HS256"
-    jwt_expire_minutes: int = 30
+    jwt_expire_minutes: int = 15
     cors_origins: list[str] = []
+    trusted_hosts: list[str] = ["localhost", "127.0.0.1", "testserver"]
 
     model_config = SettingsConfigDict(
         env_file=".env",

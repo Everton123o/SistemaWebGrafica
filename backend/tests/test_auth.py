@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 from fastapi.testclient import TestClient
-from jose import jwt
+import jwt
 from sqlalchemy import create_engine, select
 from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError
@@ -16,6 +16,10 @@ from app.core.security import settings, verify_password
 from app.main import create_app
 from app.models.user import User
 from app.models.client import Client
+
+
+def csrf_headers(client):
+    return {'X-CSRF-Token': client.cookies.get('printpro_csrf', '')}
 
 
 @pytest.fixture
@@ -51,8 +55,8 @@ def test_register_login_restore_and_permissions(api):
     profile = session.scalar(select(Client))
     assert profile.user_id == user.id
     assert profile.registration_details['city'] == 'Sao Paulo'
-    auth = {'Authorization': 'Bearer ' + result['access_token']}
-    assert client.get('/auth/me', headers=auth).json()['id'] == user.id
+    auth = csrf_headers(client)
+    assert client.get('/auth/me').json()['id'] == user.id
     assert client.post('/auth/login', json={'email': ' CLIENTE@EXAMPLE.COM ', 'password': data['password']}).status_code == 200
     assert client.post('/auth/register', json=data).status_code == 409
     assert client.get('/clients', headers=auth).status_code == 403
@@ -62,18 +66,23 @@ def test_register_login_restore_and_permissions(api):
 def test_invalid_credentials_tokens_and_disabled_accounts(api):
     client, session = api
     data = payload()
-    token = client.post('/auth/register', json=data).json()['access_token']
+    client.post('/auth/register', json=data)
+    token = client.cookies.get('printpro_access')
     for email, password in [(data['email'], 'wrong'), ('missing@example.com', data['password'])]:
         assert client.post('/auth/login', json={'email': email, 'password': password}).status_code == 401
-    for headers in [{}, {'Authorization': 'Bearer invalid'}]:
-        assert client.get('/auth/me', headers=headers).status_code == 401
+    client.cookies.clear()
+    assert client.get('/auth/me').status_code == 401
+    client.cookies.set('printpro_access', 'invalid')
+    assert client.get('/auth/me').status_code == 401
     expired = jwt.encode({'sub': '1', 'exp': datetime.now(timezone.utc) - timedelta(minutes=1)},
                          settings.jwt_secret, algorithm=settings.jwt_algorithm)
-    assert client.get('/auth/me', headers={'Authorization': 'Bearer ' + expired}).status_code == 401
+    client.cookies.set('printpro_access', expired)
+    assert client.get('/auth/me').status_code == 401
     user = session.scalar(select(User))
     user.is_active = False
     session.commit()
-    assert client.get('/auth/me', headers={'Authorization': 'Bearer ' + token}).status_code == 401
+    client.cookies.set('printpro_access', token)
+    assert client.get('/auth/me').status_code == 401
     assert client.post('/auth/login', json={'email': data['email'], 'password': data['password']}).status_code == 401
 
 
@@ -87,11 +96,11 @@ def test_registration_validates_on_server(api, patch):
 @pytest.mark.parametrize('role', ['admin', 'employee'])
 def test_staff_roles_come_from_database(api, role):
     client, session = api
-    token = client.post('/auth/register', json=payload()).json()['access_token']
+    client.post('/auth/register', json=payload())
     user = session.scalar(select(User))
     user.role = role
     session.commit()
-    auth = {'Authorization': 'Bearer ' + token}
+    auth = csrf_headers(client)
     assert client.get('/auth/me', headers=auth).json()['role'] == role
     assert client.get('/clients', headers=auth).status_code == 200
 
@@ -109,11 +118,11 @@ def test_company_registration_and_duplicate_document(api):
 
 def test_admin_can_create_update_and_disable_users(api):
     client, session = api
-    client_token = client.post('/auth/register', json=payload()).json()['access_token']
+    client.post('/auth/register', json=payload())
     admin = session.scalar(select(User))
     admin.role = 'admin'
     session.commit()
-    auth = {'Authorization': 'Bearer ' + client_token}
+    auth = csrf_headers(client)
     created = client.post('/users', headers=auth, json={
         'name': 'Operador', 'email': 'operador@example.com',
         'password': 'senha-operador', 'role': 'employee'

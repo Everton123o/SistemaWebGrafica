@@ -1,0 +1,1 @@
+   leia os .harness ANTES, e tudo q implementar de conceitos adicione no "ARQUITETURA E CONCEITOS.md"

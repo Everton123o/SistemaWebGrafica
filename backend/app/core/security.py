@@ -5,7 +5,7 @@ import hmac
 import secrets
 from datetime import datetime, timedelta, timezone
 
-from jose import jwt
+import jwt
 
 from app.core.config import get_settings
 
@@ -13,24 +13,26 @@ settings = get_settings()
 
 
 def jwt_key() -> str:
-    if not settings.jwt_secret:
+    if not settings.jwt_secret or len(settings.jwt_secret.encode("utf-8")) < 32:
         raise RuntimeError("JWT_SECRET não está configurada")
     return settings.jwt_secret
 
 
-def create_access_token(user_id: int) -> str:
+def create_access_token(user_id: int, token_version: int = 0) -> str:
     now = datetime.now(timezone.utc)
     return jwt.encode(
-        {"sub": str(user_id), "iat": now,
+        {"sub": str(user_id), "ver": token_version, "iat": now, "iss": "sistema-web-grafica",
+         "aud": "sistema-web-grafica-api", "jti": secrets.token_urlsafe(24),
          "exp": now + timedelta(minutes=settings.jwt_expire_minutes)},
-        jwt_key(), algorithm=settings.jwt_algorithm,
+        jwt_key(), algorithm="HS256",
     )
 
 
-def decode_access_token(token: str) -> int:
-    payload = jwt.decode(token, jwt_key(), algorithms=[settings.jwt_algorithm],
-                         options={"require_exp": True, "require_sub": True})
-    return int(payload["sub"])
+def decode_access_token(token: str) -> tuple[int, int]:
+    payload = jwt.decode(token, jwt_key(), algorithms=["HS256"],
+                         issuer="sistema-web-grafica", audience="sistema-web-grafica-api",
+                         options={"require": ["exp", "sub", "iss", "aud", "jti", "ver"]})
+    return int(payload["sub"]), int(payload["ver"])
 
 
 def hash_password(password: str) -> str:

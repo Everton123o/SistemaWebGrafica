@@ -51,6 +51,7 @@ class UserService:
                 raise UserAlreadyExistsError
         if "password" in values:
             user.password_hash = hash_password(values.pop("password"))
+            user.token_version += 1
         for field, value in values.items():
             setattr(user, field, value)
         try:

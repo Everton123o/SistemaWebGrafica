@@ -9,6 +9,7 @@ from app.schemas.user import UserRead
 
 
 class LoginRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     email: str = Field(min_length=3, max_length=255)
     password: str = Field(min_length=1, max_length=128)
 
@@ -34,7 +35,7 @@ class Address(BaseModel):
 
 class RegisterRequest(LoginRequest):
     model_config = ConfigDict(extra="forbid")
-    password: str = Field(min_length=8, max_length=128)
+    password: str = Field(min_length=12, max_length=128)
     name: str = Field(min_length=1, max_length=120)
     personType: Literal["PF", "PJ"]
     document: str = Field(max_length=18)
@@ -71,7 +72,6 @@ class RegisterRequest(LoginRequest):
 
 
 class AuthResponse(BaseModel):
-    access_token: str
-    token_type: str = "bearer"
+    csrf_token: str
     expires_in: int
     user: UserRead

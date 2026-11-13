@@ -10,8 +10,8 @@ class ClientRepository:
     def __init__(self, session: Session):
         self.session = session
 
-    def list(self) -> list[Client]:
-        return list(self.session.scalars(select(Client).order_by(Client.id)))
+    def list(self, limit: int = 100, offset: int = 0) -> list[Client]:
+        return list(self.session.scalars(select(Client).order_by(Client.id).limit(limit).offset(offset)))
 
     def get_by_id(self, client_id: int) -> Client | None:
         return self.session.get(Client, client_id)

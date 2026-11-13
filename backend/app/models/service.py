@@ -1,6 +1,7 @@
 """Persisted print services and their dynamic order requirements."""
 
 from datetime import datetime
+from typing import Optional
 
 from sqlalchemy import Boolean, DateTime, Float, JSON, String, func
 from sqlalchemy.orm import Mapped, mapped_column
@@ -23,7 +24,7 @@ class Service(Base):
     requirements: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
     rating: Mapped[float] = mapped_column(Float, nullable=False, default=5)
     review_count: Mapped[int] = mapped_column(nullable=False, default=0)
-    badge: Mapped[str] = mapped_column(String(80), nullable=True)
+    badge: Mapped[Optional[str]] = mapped_column(String(80), nullable=True)
     popular: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     inactive: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)

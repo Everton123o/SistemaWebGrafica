@@ -27,28 +27,18 @@ export function AppProvider({ children }) {
   
   // Data states
   const [services, setServices] = useState(() => {
-    const saved = localStorage.getItem('printpro_services');
-    return saved ? JSON.parse(saved) : INITIAL_SERVICES;
+    return INITIAL_SERVICES;
   });
   const [servicesLoading, setServicesLoading] = useState(false);
   const [servicesError, setServicesError] = useState('');
 
-  const [orders, setOrders] = useState(() => {
-    const saved = localStorage.getItem('printpro_orders');
-    return saved ? JSON.parse(saved) : INITIAL_ORDERS;
-  });
+  const [orders, setOrders] = useState(() => INITIAL_ORDERS);
 
-  const [users, setUsers] = useState(() => {
-    const saved = localStorage.getItem('printpro_users');
-    return saved ? JSON.parse(saved) : INITIAL_USERS;
-  });
+  const [users, setUsers] = useState(() => INITIAL_USERS);
   const [usersLoading, setUsersLoading] = useState(false);
   const [usersError, setUsersError] = useState('');
 
-  const [clients, setClients] = useState(() => {
-    const saved = localStorage.getItem('printpro_clients');
-    return saved ? JSON.parse(saved) : INITIAL_CLIENTS;
-  });
+  const [clients, setClients] = useState(() => INITIAL_CLIENTS);
   const [clientsLoading, setClientsLoading] = useState(false);
   const [clientsError, setClientsError] = useState('');
 
@@ -62,18 +52,23 @@ export function AppProvider({ children }) {
 
   useEffect(() => {
     let active = true;
+    Object.keys(localStorage).filter((key) => key.startsWith('printpro_'))
+      .forEach((key) => localStorage.removeItem(key));
     localStorage.removeItem('printpro_session');
     const restore = async () => {
       try {
         if (getToken()) {
           const user = mapUser(await authApi.me());
-          if (active) { setCurrentUser(user); setCurrentView(ROLE_HOME_VIEW[user.role]); }
+          if (active) {
+            setCurrentUser(user);
+            setCurrentView(ROLE_HOME_VIEW[user.role]);
+          }
         }
       } catch { clearToken(); }
       finally { if (active) setAuthLoading(false); }
     };
     restore();
-    const expired = () => { setCurrentUser(null); setCart([]); setCurrentView('login'); };
+    const expired = () => { Object.keys(localStorage).filter((key) => key.startsWith('printpro_')).forEach((key) => localStorage.removeItem(key)); setCurrentUser(null); setCart([]); setOrders([]); setClients([]); setUsers([]); setCurrentView('login'); };
     window.addEventListener('auth:expired', expired);
     return () => { active = false; window.removeEventListener('auth:expired', expired); };
   }, []);
@@ -138,18 +133,6 @@ export function AppProvider({ children }) {
   }, [services]);
 
   useEffect(() => {
-    localStorage.setItem('printpro_orders', JSON.stringify(orders));
-  }, [orders]);
-
-  useEffect(() => {
-    localStorage.setItem('printpro_users', JSON.stringify(users));
-  }, [users]);
-
-  useEffect(() => {
-    localStorage.setItem('printpro_clients', JSON.stringify(clients));
-  }, [clients]);
-
-  useEffect(() => {
     localStorage.setItem('printpro_settings', JSON.stringify(settings));
   }, [settings]);
 
@@ -179,7 +162,7 @@ export function AppProvider({ children }) {
 
   const startSession = (result) => {
     const user = mapUser(result.user);
-    saveToken(result.access_token, result.expires_in);
+    saveToken(result.csrf_token, result.expires_in);
     setCurrentUser(user);
     setCart([]);
     navigateTo(ROLE_HOME_VIEW[user.role]);
@@ -202,9 +185,13 @@ export function AppProvider({ children }) {
   };
 
   const logout = () => {
+    authApi.logout().catch(() => {});
     clearToken();
     setCurrentUser(null);
     setCart([]);
+    setOrders([]);
+    setClients([]);
+    setUsers([]);
     navigateTo('login');
     addToast('Você saiu da sua conta.', 'info');
   };
@@ -254,6 +241,7 @@ export function AppProvider({ children }) {
     orderApi.create(newOrder)
       .then((saved) => {
         setOrders(prev => prev.map(o => o.id === newId ? saved : o));
+        setSelectedOrderId(saved.id);
       })
       .catch(() => {});
 

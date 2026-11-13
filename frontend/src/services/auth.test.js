@@ -20,10 +20,11 @@ test('login sends credentials to API and preserves server errors', async () => {
   await assert.rejects(authApi.login({ email: 'a@example.com', password: 'wrong' }), /Credenciais inválidas/);
 });
 
-test('session restoration sends bearer token and 401 clears it', async () => {
+test('session restoration sends cookies and 401 clears the CSRF session value', async () => {
   saveToken('test-token', 60);
   globalThis.fetch = async (_url, options) => {
-    assert.equal(options.headers.Authorization, 'Bearer test-token');
+    assert.equal(options.headers.Authorization, undefined);
+    assert.equal(options.credentials, 'include');
     return new Response('{}', { status: 401 });
   };
   let expired = false;

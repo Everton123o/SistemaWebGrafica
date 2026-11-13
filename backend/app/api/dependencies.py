@@ -2,8 +2,7 @@
 
 from collections.abc import Generator
 
-from fastapi import Depends, HTTPException
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -16,19 +15,17 @@ def database_session() -> Generator[Session, None, None]:
 
 DatabaseSession = Depends(database_session)
 
-bearer = HTTPBearer(auto_error=False)
-
-
-def current_user(credentials: HTTPAuthorizationCredentials | None = Depends(bearer),
-                 session: Session = DatabaseSession):
+def current_user(request: Request, session: Session = DatabaseSession):
     from app.services.auth import AuthService, InvalidCredentialsError
     try:
-        if credentials is None:
+        token = request.cookies.get("printpro_access")
+        if not token:
             raise InvalidCredentialsError
-        return AuthService(session).current_user(credentials.credentials)
+        user = AuthService(session).current_user(token)
+        return user
     except InvalidCredentialsError:
         raise HTTPException(401, "Sessão inválida ou expirada.",
-                            headers={"WWW-Authenticate": "Bearer"}) from None
+                            headers={}) from None
 
 
 CurrentUser = Depends(current_user)
