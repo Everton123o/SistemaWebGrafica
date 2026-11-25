@@ -20,7 +20,7 @@ def create_app() -> FastAPI:
 
     @application.middleware("http")
     async def security_headers(request, call_next):
-        if request.method not in {"GET", "HEAD", "OPTIONS"} and request.url.path not in {"/auth/login", "/auth/register"}:
+        if request.method not in {"GET", "HEAD", "OPTIONS"} and request.url.path not in {"/api/auth/login", "/api/auth/register"}:
             access_cookie = request.cookies.get("printpro_access")
             if access_cookie:
                 csrf_cookie = request.cookies.get("printpro_csrf", "")
