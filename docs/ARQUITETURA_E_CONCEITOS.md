@@ -126,7 +126,7 @@ A API depende de uma dependência de sessão, e os Services recebem uma sessão 
 - O segredo JWT será lido por variável de ambiente.
 - Arquivos `.env` não são versionados.
 - Schemas de resposta não expõem o hash da senha.
-- A autenticação JWT e a autorização por papel ainda serão implementadas antes de considerar endpoints administrativos prontos para produção.
+- A API autentica sessões com JWT em cookie HttpOnly e aplica autorização por papel nos endpoints protegidos.
 
 ## 7. Banco de dados e migrations
 
@@ -178,10 +178,31 @@ Exemplo: criação de usuário.
 
 ## 10. Próximos conceitos a documentar
 
-- autenticação e autorização com JWT;
-- permissões por papel;
-- pedidos e orçamentos;
 - upload seguro de arquivos;
-- transações e regras de status;
-- testes de integração da API;
-- integração com o frontend React.
+- testes de integração da API.
+
+## 11. Segurança e integridade implementadas
+
+### Sessões e autenticação
+
+- A API valida JWT com algoritmo fixo HS256, emissor, audiência e identificador único.
+- O JWT é enviado em cookie `HttpOnly`; o token não fica disponível ao JavaScript do frontend.
+- Operações de escrita exigem token CSRF por cookie e cabeçalho `X-CSRF-Token`.
+- Logout e troca de senha incrementam `token_version`, revogando sessões emitidas anteriormente.
+- As senhas são armazenadas com PBKDF2 e salt individual; login para e-mail inexistente executa verificação contra hash dummy.
+- Tentativas de login são limitadas por conta e IP. Os identificadores são guardados como HMAC na tabela `login_attempts`.
+
+### Pedidos e autorização
+
+- Schemas de criação, atualização de cliente e atualização da equipe são separados e rejeitam campos extras.
+- Clientes só listam pedidos associados ao `client_id` autenticado e só podem enviar correções em pedidos próprios.
+- Status, orçamento e preço não são aceitos no contrato de criação do cliente. O preço é calculado pela API.
+- Códigos de pedido usam valores aleatórios, com nova tentativa em colisão de chave única.
+- A migration `f41a5b6c7d8e` associa pedidos antigos ao cadastro de cliente pelo e-mail e cria índices para `client_id` e CPF/CNPJ.
+
+### Dados de clientes e frontend
+
+- O cadastro administrativo de clientes não aceita `user_id` no payload e valida e-mail e CPF/CNPJ.
+- A listagem de clientes é paginada e mascara CPF/CNPJ para funcionários.
+- Dados de pedidos, clientes e usuários permanecem em memória; logout e expiração limpam a sessão e as chaves `printpro_*` do navegador.
+- A API adiciona cabeçalhos de segurança, valida hosts permitidos e registra campos alterados em pedidos sem incluir tokens ou senhas nos logs.
