@@ -45,7 +45,7 @@ def payload():
 def test_register_login_restore_and_permissions(api):
     client, session = api
     data = payload()
-    response = client.post('/auth/register', json=data)
+    response = client.post('/api/auth/register', json=data)
     assert response.status_code == 201, response.text
     result = response.json()
     assert result['user']['role'] == 'client'
@@ -56,86 +56,86 @@ def test_register_login_restore_and_permissions(api):
     assert profile.user_id == user.id
     assert profile.registration_details['city'] == 'Sao Paulo'
     auth = csrf_headers(client)
-    assert client.get('/auth/me').json()['id'] == user.id
-    assert client.post('/auth/login', json={'email': ' CLIENTE@EXAMPLE.COM ', 'password': data['password']}).status_code == 200
-    assert client.post('/auth/register', json=data).status_code == 409
-    assert client.get('/clients', headers=auth).status_code == 403
-    assert client.post('/users', headers=auth, json={}).status_code == 403
+    assert client.get('/api/auth/me').json()['id'] == user.id
+    assert client.post('/api/auth/login', json={'email': ' CLIENTE@EXAMPLE.COM ', 'password': data['password']}).status_code == 200
+    assert client.post('/api/auth/register', json=data).status_code == 409
+    assert client.get('/api/clients', headers=auth).status_code == 403
+    assert client.post('/api/users', headers=auth, json={}).status_code == 403
 
 
 def test_invalid_credentials_tokens_and_disabled_accounts(api):
     client, session = api
     data = payload()
-    client.post('/auth/register', json=data)
+    client.post('/api/auth/register', json=data)
     token = client.cookies.get('printpro_access')
     for email, password in [(data['email'], 'wrong'), ('missing@example.com', data['password'])]:
-        assert client.post('/auth/login', json={'email': email, 'password': password}).status_code == 401
+        assert client.post('/api/auth/login', json={'email': email, 'password': password}).status_code == 401
     client.cookies.clear()
-    assert client.get('/auth/me').status_code == 401
+    assert client.get('/api/auth/me').status_code == 401
     client.cookies.set('printpro_access', 'invalid')
-    assert client.get('/auth/me').status_code == 401
+    assert client.get('/api/auth/me').status_code == 401
     expired = jwt.encode({'sub': '1', 'exp': datetime.now(timezone.utc) - timedelta(minutes=1)},
                          settings.jwt_secret, algorithm=settings.jwt_algorithm)
     client.cookies.set('printpro_access', expired)
-    assert client.get('/auth/me').status_code == 401
+    assert client.get('/api/auth/me').status_code == 401
     user = session.scalar(select(User))
     user.is_active = False
     session.commit()
     client.cookies.set('printpro_access', token)
-    assert client.get('/auth/me').status_code == 401
-    assert client.post('/auth/login', json={'email': data['email'], 'password': data['password']}).status_code == 401
+    assert client.get('/api/auth/me').status_code == 401
+    assert client.post('/api/auth/login', json={'email': data['email'], 'password': data['password']}).status_code == 401
 
 
 @pytest.mark.parametrize('patch', [{'role': 'admin'}, {'password': 'short'}, {'document': '11111111111'}, {'email': 'invalid'}])
 def test_registration_validates_on_server(api, patch):
     client, session = api
-    assert client.post('/auth/register', json={**payload(), **patch}).status_code == 422
+    assert client.post('/api/auth/register', json={**payload(), **patch}).status_code == 422
     assert session.scalar(select(User)) is None
 
 
 @pytest.mark.parametrize('role', ['admin', 'employee'])
 def test_staff_roles_come_from_database(api, role):
     client, session = api
-    client.post('/auth/register', json=payload())
+    client.post('/api/auth/register', json=payload())
     user = session.scalar(select(User))
     user.role = role
     session.commit()
     auth = csrf_headers(client)
-    assert client.get('/auth/me', headers=auth).json()['role'] == role
-    assert client.get('/clients', headers=auth).status_code == 200
+    assert client.get('/api/auth/me', headers=auth).json()['role'] == role
+    assert client.get('/api/clients', headers=auth).status_code == 200
 
 
 def test_company_registration_and_duplicate_document(api):
     client, session = api
     data = {**payload(), 'personType': 'PJ', 'document': '11.222.333/0001-81',
             'company': 'Empresa Teste'}
-    assert client.post('/auth/register', json=data).status_code == 201
+    assert client.post('/api/auth/register', json=data).status_code == 201
     profile = session.scalar(select(Client))
     assert profile.name == 'Empresa Teste'
     assert profile.registration_details['company'] == 'Empresa Teste'
-    assert client.post('/auth/register', json={**data, 'email': 'other@example.com'}).status_code == 409
+    assert client.post('/api/auth/register', json={**data, 'email': 'other@example.com'}).status_code == 409
 
 
 def test_admin_can_create_update_and_disable_users(api):
     client, session = api
-    client.post('/auth/register', json=payload())
+    client.post('/api/auth/register', json=payload())
     admin = session.scalar(select(User))
     admin.role = 'admin'
     session.commit()
     auth = csrf_headers(client)
-    created = client.post('/users', headers=auth, json={
+    created = client.post('/api/users', headers=auth, json={
         'name': 'Operador', 'email': 'operador@example.com',
         'password': 'senha-operador', 'role': 'employee'
     })
     assert created.status_code == 201, created.text
     user_id = created.json()['id']
-    assert client.get('/users', headers=auth).status_code == 200
-    updated = client.patch(f'/users/{user_id}', headers=auth,
+    assert client.get('/api/users', headers=auth).status_code == 200
+    updated = client.patch(f'/api/users/{user_id}', headers=auth,
                            json={'name': 'Operador Atualizado', 'is_active': False})
     assert updated.status_code == 200
     assert updated.json()['name'] == 'Operador Atualizado'
     assert updated.json()['is_active'] is False
-    assert client.patch('/users/999999', headers=auth, json={'name': 'X'}).status_code == 404
+    assert client.patch('/api/users/999999', headers=auth, json={'name': 'X'}).status_code == 404
 
 
 def test_customer_persistence_failure_rolls_back_user(api):
@@ -146,7 +146,7 @@ def test_customer_persistence_failure_rolls_back_user(api):
 
     event.listen(Client, 'before_insert', fail_insert)
     try:
-        assert client.post('/auth/register', json=payload()).status_code == 409
+        assert client.post('/api/auth/register', json=payload()).status_code == 409
     finally:
         event.remove(Client, 'before_insert', fail_insert)
     assert session.scalar(select(User)) is None
